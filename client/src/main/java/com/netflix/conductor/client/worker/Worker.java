@@ -26,10 +26,12 @@ import java.net.UnknownHostException;
 import java.util.function.Function;
 
 /**
- * @author visingh
+ * worker名称、执行任务、更新出错、暂停、获取标识、创建worker、获取轮询时间
  */
 public interface Worker {
     /**
+     * worker正执行的的任务定义的名称。
+     *
      * Retrieve the name of the task definition the worker is currently working on.
      *
      * @return the name of the task definition.
@@ -37,6 +39,7 @@ public interface Worker {
     String getTaskDefName();
 
     /**
+     * 执行任务、并返回更新的任务。
      * Executes a task and returns the updated task.
      *
      * @param task Task to be executed.
@@ -54,32 +57,40 @@ public interface Worker {
     }
 
     /**
-     * Called when the task coordinator fails to update the task to the server.
+     * 当任务协调器失败的时候、更新任务到服务。client应该存储任务的id、并且稍后重试更新。
+     *
+     * Called when the task coordinator(协调器) fails to update the task to the server.
      * Client should store the task id (in a database) and retry the update later
      *
-     * @param task Task which cannot be updated back to the server.
+     * @param task Task which cannot be updated back to the server."无法更新会服务的任务"
      */
     default void onErrorUpdate(Task task) {
 
     }
 
     /**
+     * 重写该方法、将worker从轮询中停止。
      * Override this method to pause the worker from polling.
      *
-     * @return true if the worker is paused and no more tasks should be polled from server.
+     * @return true if the worker is paused and no more tasks should be polled(轮询) from server.
+     *          worker停止、则返回true。
      */
     default boolean paused() {
         return PropertyFactory.getBoolean(getTaskDefName(), "paused", false);
     }
 
     /**
+     * 根据应用程序、重写此方法。
+     *
      * Override this method to app specific rules.
      *
      * @return returns the serverId as the id of the instance that the worker is running.
+     *         返回serverId作为实例的id(worker正在运行其上的实例)
      */
     default String getIdentity() {
         String serverId;
         try {
+            //获取主机名称
             serverId = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
             serverId = System.getenv("HOSTNAME");
@@ -100,6 +111,8 @@ public interface Worker {
     }
 
     /**
+     * 获取轮询的间隔，单位毫秒。
+     *
      * Override this method to change the interval between polls.
      *
      * @return interval in millisecond at which the server should be polled for worker tasks.
@@ -116,19 +129,27 @@ public interface Worker {
         return PropertyFactory.getInteger(getTaskDefName(), "longPollTimeout", 100);
     }
 
+    /**
+     * @param taskType 任务类型
+     * @param executor 任务执行器：任务、返回值 - Function<InputType,ReturnType>
+     * @return 创建的新的worker对象
+     */
     static Worker create(String taskType, Function<Task, TaskResult> executor) {
-        return new Worker() {
 
+        return new Worker() {
+            //任务名称
             @Override
             public String getTaskDefName() {
                 return taskType;
             }
 
+            //执行任务
             @Override
             public TaskResult execute(Task task) {
                 return executor.apply(task);
             }
 
+            //停止任务
             @Override
             public boolean paused() {
                 return Worker.super.paused();

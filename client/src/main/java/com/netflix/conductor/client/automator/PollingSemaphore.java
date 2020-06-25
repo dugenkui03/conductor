@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+// automator 自动监控器
 package com.netflix.conductor.client.automator;
 
 import java.util.concurrent.Semaphore;
@@ -20,13 +21,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A class wrapping a semaphore which holds the number of permits available for polling and executing tasks.
+ * 轮询信号量：包装信号量的类、持有用来轮询和执行任务的许可数量。
+ *
+ * A class wrapping a semaphore which holds the number of permits(许可) available for polling and executing tasks.
  */
 class PollingSemaphore {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(PollingSemaphore.class);
+
     private Semaphore semaphore;
 
+    //slot：槽、位置
     PollingSemaphore(int numSlots) {
         LOGGER.debug("Polling semaphore initialized with {} permits", numSlots);
         semaphore = new Semaphore(numSlots);
@@ -35,7 +39,7 @@ class PollingSemaphore {
     /**
      * Signals if polling is allowed based on whether a permit can be acquired.
      *
-     * @return {@code true} - if permit is acquired
+     * @return {@code true} - if permit is acquired 是否可以获取到轮询许可
      *         {@code false} - if permit could not be acquired
      */
     boolean canPoll() {
@@ -45,6 +49,8 @@ class PollingSemaphore {
     }
 
     /**
+     * 处理完一个任务后、释放许可
+     *
      * Signals that processing is complete and the permit can be released.
      */
     void complete() {
@@ -53,6 +59,8 @@ class PollingSemaphore {
     }
 
     /**
+     * 获取可用于轮询的线程数量。
+     *
      * Gets the number of threads available for processing.
      *
      * @return number of available permits

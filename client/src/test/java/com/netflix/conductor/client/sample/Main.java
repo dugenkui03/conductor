@@ -24,11 +24,16 @@ public class Main {
 
     public static void main(String[] args) {
 
+        //任务client
         TaskClient taskClient = new TaskClient();
+        //服务api的根uri
         taskClient.setRootURI("http://localhost:8080/api/");        //Point this to the server API
 
-        int threadCount = 2;            //number of threads used to execute workers.  To avoid starvation, should be same or more than number of workers
+        //指定worker线程数量，为了避免线程饥饿、线程数量不应该小于worker数量
+        //number of threads used to execute workers.  To avoid starvation, should be same or more than number of workers
+        int threadCount = 2;
 
+        //创建worker
         Worker worker1 = new SampleWorker("task_1");
         Worker worker2 = new SampleWorker("task_5");
 

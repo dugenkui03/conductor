@@ -27,7 +27,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Configures automated polling of tasks and execution via the registered {@link Worker}s.
+ * Configures automated polling(轮询) of tasks and execution via the registered {@link Worker}s.
  */
 public class TaskRunnerConfigurer {
 

@@ -17,12 +17,15 @@
 package com.netflix.conductor.common.run;
 
 /**
+ * 外部存储路径：描述json在外部存储中的位置。
+ * <p>
+ *
  * Describes the location where the JSON payload is stored in external storage.
- * <ul>
- * <li>
+ * <p>
  * The location is described using the following fields:
- * <li>uri: The uri of the json file in external storage</li>
- * <li>path: The relative path of the file in external storage</li>
+ * <ul>
+ * <li>uri: The uri of the json file in external storage</li> json的外部存储uri
+ * <li>path: The relative path of the file in external storage</li> 外部存储的相关路径
  * </ul>
  */
 public class ExternalStorageLocation {

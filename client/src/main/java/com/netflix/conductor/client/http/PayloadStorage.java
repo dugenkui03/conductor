@@ -33,18 +33,24 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 /**
+ * 额外-净负荷-存储的实现、用于存储大型json。
+ *
  * An implementation of {@link ExternalPayloadStorage} for storing large JSON payload data.
  */
 class PayloadStorage implements ExternalPayloadStorage {
     private static final Logger logger = LoggerFactory.getLogger(PayloadStorage.class);
 
+    //唯一属性
     private final ClientBase clientBase;
+
 
     PayloadStorage(ClientBase clientBase) {
         this.clientBase = clientBase;
     }
 
     /**
+     * 该方法并非用于客户端。客户端向服务发送请求、获取ExternalStorageLocation
+     *
      * This method is not intended to be used in the client.
      * The client makes a request to the server to get the {@link ExternalStorageLocation}
      */

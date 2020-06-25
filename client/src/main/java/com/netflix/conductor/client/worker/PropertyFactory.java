@@ -26,6 +26,8 @@ import com.netflix.config.DynamicProperty;
  * @author Viren
  * Used to configure the Conductor workers using properties.
  *
+ * 使用properties配置conductor worker。
+ *
  */
 public class PropertyFactory {
 
@@ -37,6 +39,13 @@ public class PropertyFactory {
 
 	private static ConcurrentHashMap<String, PropertyFactory> factories = new ConcurrentHashMap<>();
 
+	/**
+	 * 创建属性工厂。
+	 *
+	 * @param prefix "conductor.worker"
+	 * @param propName 属性名称
+	 * @param workerName worker名称
+	 */
 	private PropertyFactory(String prefix, String propName, String workerName) {
 		this.global = DynamicProperty.getInstance(prefix + "." + propName);
 		this.local = DynamicProperty.getInstance(prefix + "." + workerName + "." + propName);

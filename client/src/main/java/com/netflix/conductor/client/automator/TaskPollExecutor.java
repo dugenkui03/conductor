@@ -40,23 +40,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Manages the threadpool used by the workers for execution and server communication (polling and task update).
+ * 任务轮询执行器：管理worker来执行和服务交流的线程池（轮询和任务更新）
+ *
+ * Manages the threadPool used by the workers for execution and server communication (polling and task update).
  */
 class TaskPollExecutor {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskPollExecutor.class);
 
     private EurekaClient eurekaClient;
+    //任务客户端
     private TaskClient taskClient;
+    //更新重试次数
     private int updateRetryCount;
+    //线程池
     private ExecutorService executorService;
+    //轮询信号量
     private PollingSemaphore pollingSemaphore;
 
     private static final String DOMAIN = "domain";
     private static final String ALL_WORKERS = "all";
 
-    TaskPollExecutor(EurekaClient eurekaClient, TaskClient taskClient, int threadCount, int updateRetryCount,
-        String workerNamePrefix) {
+
+    //任务客户端、线程数量、更新重试数量、worker名称前缀
+    TaskPollExecutor(EurekaClient eurekaClient, TaskClient taskClient,
+                     int threadCount, int updateRetryCount, String workerNamePrefix) {
         this.eurekaClient = eurekaClient;
         this.taskClient = taskClient;
         this.updateRetryCount = updateRetryCount;
@@ -65,15 +72,17 @@ class TaskPollExecutor {
 
         AtomicInteger count = new AtomicInteger(0);
 
+        //固定大小线程池：线程池数量、线程池工厂(线程名称、异常处理器)
         this.executorService = Executors.newFixedThreadPool(threadCount,
-            new BasicThreadFactory.Builder()
-                .namingPattern(workerNamePrefix + count.getAndIncrement())
-                .uncaughtExceptionHandler(uncaughtExceptionHandler)
-                .build());
+                new BasicThreadFactory.Builder()
+                        .namingPattern(workerNamePrefix + count.getAndIncrement())
+                        .uncaughtExceptionHandler(uncaughtExceptionHandler)
+                        .build());
 
         this.pollingSemaphore = new PollingSemaphore(threadCount);
     }
 
+    //轮询并且执行
     void pollAndExecute(Worker worker) {
         if (eurekaClient != null && !eurekaClient.getInstanceRemoteStatus().equals(InstanceStatus.UP)) {
             LOGGER.debug("Instance is NOT UP in discovery - will not poll");
@@ -141,6 +150,7 @@ class TaskPollExecutor {
         }
     }
 
+    //未捕获的异常处理器：递增MetricsContainer相关指标
     @SuppressWarnings("FieldCanBeLocal")
     private final Thread.UncaughtExceptionHandler uncaughtExceptionHandler = (thread, error) -> {
         // JVM may be in unstable state, try to send metrics then exit
@@ -150,11 +160,13 @@ class TaskPollExecutor {
 
 
     private Task processTask(Task task, Worker worker) {
+        //任务和worker的名称、id
         LOGGER.debug("Executing task: {} of type: {} in worker: {} at {}", task.getTaskId(), task.getTaskDefName(),
             worker.getClass().getSimpleName(), worker.getIdentity());
         try {
             executeTask(worker, task);
         } catch (Throwable t) {
+            //抛异常的时候、任务状态设置失败
             task.setStatus(Task.Status.FAILED);
             TaskResult result = new TaskResult(task);
             handleException(t, result, worker, task);
@@ -164,18 +176,26 @@ class TaskPollExecutor {
         return task;
     }
 
+    /**
+     * @param worker 执行者
+     * @param task 被执行的任务
+     */
     private void executeTask(Worker worker, Task task) {
         Stopwatch stopwatch = Stopwatch.createStarted();
         TaskResult result = null;
         try {
-            LOGGER.debug("Executing task: {} in worker: {} at {}", task.getTaskId(), worker.getClass().getSimpleName(),
-                worker.getIdentity());
+            LOGGER.debug("Executing task: {} in worker: {} at {}"
+                    , task.getTaskId(), worker.getClass().getSimpleName(), worker.getIdentity());
+            //执行任务、获取结果
             result = worker.execute(task);
+
+            //设置任务结果的工作流实例id、任务id和worker的Id
             result.setWorkflowInstanceId(task.getWorkflowInstanceId());
             result.setTaskId(task.getTaskId());
             result.setWorkerId(worker.getIdentity());
         } catch (Exception e) {
             LOGGER.error("Unable to execute task: {} of type: {}", task.getTaskId(), task.getTaskDefName(), e);
+            //如果任务执行结果不为空
             if (result == null) {
                 task.setStatus(Task.Status.FAILED);
                 result = new TaskResult(task);
@@ -187,11 +207,13 @@ class TaskPollExecutor {
                 .record(stopwatch.elapsed(TimeUnit.MILLISECONDS), TimeUnit.MILLISECONDS);
         }
 
-        LOGGER.debug("Task: {} executed by worker: {} at {} with status: {}", task.getTaskId(),
-            worker.getClass().getSimpleName(), worker.getIdentity(), result.getStatus());
+        LOGGER.debug("Task: {} executed by worker: {} at {} with status: {}",
+                task.getTaskId(), worker.getClass().getSimpleName(), worker.getIdentity(), result.getStatus());
+
         updateWithRetry(updateRetryCount, task, result, worker);
     }
 
+    //finalize 使结束
     private void finalizeTask(Task task, Throwable throwable) {
         if (throwable != null) {
             LOGGER.error("Error processing task: {} of type: {}", task.getTaskId(), task.getTaskType(), throwable);
@@ -202,36 +224,65 @@ class TaskPollExecutor {
         }
     }
 
+    /**
+     * 重试
+     *
+     * @param count 与全局变量 updateRetryCount 相关
+     * @param task 重试的任务
+     * @param result 上一次的执行结果
+     * @param worker 执行任务的worker
+     */
     private void updateWithRetry(int count, Task task, TaskResult result, Worker worker) {
         try {
-            String updateTaskDesc = String
-                .format("Retry updating task result: %s for task: %s in worker: %s", result.toString(),
-                    task.getTaskDefName(), worker.getIdentity());
-            String evaluatePayloadDesc = String
-                .format("Evaluate Task payload for task: %s in worker: %s", task.getTaskDefName(),
-                    worker.getIdentity());
+            String updateTaskDesc = String.
+                    format("Retry updating task result: %s for task: %s in worker: %s",
+                            result.toString(), task.getTaskDefName(), worker.getIdentity());
+
+            String evaluatePayloadDesc = String.
+                    format("Evaluate Task payload for task: %s in worker: %s",
+                            task.getTaskDefName(), worker.getIdentity());
+
             String methodName = "updateWithRetry";
 
-            TaskResult finalResult = new RetryUtil<TaskResult>().retryOnException(() ->
-            {
-                TaskResult taskResult = result.copy();
-                taskClient.evaluateAndUploadLargePayload(taskResult, task.getTaskType());
-                return taskResult;
-            }, null, null, count, evaluatePayloadDesc, methodName);
 
-            new RetryUtil<>().retryOnException(() ->
-            {
-                taskClient.updateTask(finalResult);
-                return null;
-            }, null, null, count, updateTaskDesc, methodName);
+            //最终的结果
+            TaskResult finalResult = new RetryUtil<TaskResult>().retryOnException(
+                    //健壮性比较差的任务、需要多次执行
+                    () -> {
+                        //复制结果
+                        TaskResult taskResult = result.copy();
+                        //
+                        taskClient.evaluateAndUploadLargePayload(taskResult, task.getTaskType());
+                        return taskResult;
+                    }
+                    //重试次数、评估负荷描述，方法名称
+                    , null, null, count, evaluatePayloadDesc, methodName);
+
+
+            new RetryUtil<>().retryOnException(
+                    () -> {
+                        taskClient.updateTask(finalResult);
+                        return null;
+                    }
+                    , null, null, count, updateTaskDesc, methodName);
+
         } catch (Exception e) {
             worker.onErrorUpdate(task);
             MetricsContainer.incrementTaskUpdateErrorCount(worker.getTaskDefName(), e);
-            LOGGER.error(String.format("Failed to update result: %s for task: %s in worker: %s", result.toString(),
-                task.getTaskDefName(), worker.getIdentity()), e);
+
+            //todo 为啥搞怎么多无法控制的最高级别的日志
+            LOGGER.error(String.format("Failed to update result: %s for task: %s in worker: %s"
+                    , result.toString(), task.getTaskDefName(), worker.getIdentity()), e);
         }
     }
 
+    /**
+     * 处理任务执行抛异常的情况
+     * @param t 任务异常
+     * @param result 任务结果
+     * @param worker
+     * @param task
+     */
     private void handleException(Throwable t, TaskResult result, Worker worker, Task task) {
         LOGGER.error(String.format("Error while executing task %s", task.toString()), t);
         MetricsContainer.incrementTaskExecutionErrorCount(worker.getTaskDefName(), t);

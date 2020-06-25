@@ -31,42 +31,72 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+//Metrics 测量、度量
+//Container 容器
 public class MetricsContainer {
 
+    //任务类型
     private static final String TASK_TYPE = "taskType";
+    //工作流类型
     private static final String WORFLOW_TYPE = "workflowType";
+    //工作流版本
     private static final String WORKFLOW_VERSION = "version";
+    //异常
     private static final String EXCEPTION = "exception";
+    //实体名称
     private static final String ENTITY_NAME = "entityName";
+    //操作
     private static final String OPERATION = "operation";
+    //负载
     private static final String PAYLOAD_TYPE = "payload_type";
-
+    //任务-执行-队列-满
     private static final String TASK_EXECUTION_QUEUE_FULL = "task_execution_queue_full";
+    //任务轮询错误
     private static final String TASK_POLL_ERROR = "task_poll_error";
+    //停止的任务
     private static final String TASK_PAUSED = "task_paused";
+    //任务执行错误
     private static final String TASK_EXECUTE_ERROR = "task_execute_error";
+    //任务-确认-失败
     private static final String TASK_ACK_FAILED = "task_ack_failed";
+    //任务-确认-错误
     private static final String TASK_ACK_ERROR = "task_ack_error";
+    //任务-更新-错误
     private static final String TASK_UPDATE_ERROR = "task_update_error";
+    //任务轮询次数
     private static final String TASK_POLL_COUNTER = "task_poll_counter";
+    //任务执行时间
     private static final String TASK_EXECUTE_TIME = "task_execute_time";
+    //任务-轮询-时间
     private static final String TASK_POLL_TIME = "task_poll_time";
+    //任务结果大小
     private static final String TASK_RESULT_SIZE = "task_result_size";
+    //工作流输入大小
     private static final String WORKFLOW_INPUT_SIZE = "workflow_input_size";
+    //额外负荷
     private static final String EXTERNAL_PAYLOAD_USED = "external_payload_used";
+    //工作流开始错误
     private static final String WORKFLOW_START_ERROR = "workflow_start_error";
+    //线程未捕捉异常
     private static final String THREAD_UNCAUGHT_EXCEPTION = "thread_uncaught_exceptions";
+    //初始化的客户端
     private static final String CLIENT_INITIALIZED = "client_initialized";
 
+    //管理meters的注册器
     private static Registry registry = Spectator.globalRegistry();
+    //监视器
     private static ConcurrentHashMap<String, Timer> monitors = new ConcurrentHashMap<>();
+    //错误
     private static ConcurrentHashMap<String, Counter> errors = new ConcurrentHashMap<>();
+    //gauge传感器
     private static Map<String, AtomicLong> gauges = new ConcurrentHashMap<>();
+    //类型名称
     private static final String className = MetricsContainer.class.getSimpleName();
 
     private MetricsContainer() {
     }
 
+    //获取指定任务的轮询时长
     public static Timer getPollTimer(String taskType) {
         return getTimer(TASK_POLL_TIME, TASK_TYPE, taskType);
     }
@@ -75,6 +105,11 @@ public class MetricsContainer {
         return getTimer(TASK_EXECUTE_TIME, TASK_TYPE, taskType);
     }
 
+    /**
+     * @param name 指标名称
+     * @param additionalTags 任务名称
+     * @return
+     */
     private static Timer getTimer(String name, String... additionalTags) {
         String key = className + "." + name + "." + Joiner.on(",").join(additionalTags);
         return monitors.computeIfAbsent(key, k -> {
@@ -107,6 +142,7 @@ public class MetricsContainer {
         });
     }
 
+    //gauge 传感器
     private static AtomicLong getGauge(String name, String... additionalTags) {
         String key = className + "." + name + "." + Joiner.on(",").join(additionalTags);
         return gauges.computeIfAbsent(key, pollTimer -> {
@@ -170,11 +206,12 @@ public class MetricsContainer {
     }
 
     /**
+     * 这个指标用于跟踪 来自被降级的类的 客户端升级
      * This metric is used for tracking client upgrades from the deprecated class
      * {@link com.netflix.conductor.client.task.WorkflowTaskCoordinator} to
      * {@link com.netflix.conductor.client.automator.TaskRunnerConfigurer}
      *
-     * @param className the name of the class which initialized the client
+     * @param className the name of the class which initialized the client 初始化客户端的类的名字
      */
     public static void incrementInitializationCount(String className) {
         incrementCount(CLIENT_INITIALIZED, ENTITY_NAME, className);

@@ -60,7 +60,7 @@ import static java.lang.String.format;
  * </li>
  * </ul>
  *
- * @param <T> The type of the object that will be returned by the flaky supplier function
+ * @param <T> The type of the object that will be returned by the flaky supplier function 返回值类型
  */
 public class RetryUtil<T> {
 

@@ -50,6 +50,8 @@ import java.util.Map;
 import java.util.function.Function;
 
 /**
+ * rest模板抽象的客户端
+ *
  * Abstract client for the REST template
  */
 public abstract class ClientBase {
@@ -60,10 +62,12 @@ public abstract class ClientBase {
 
     protected String root = "";
 
+    //对象映射器？
     protected ObjectMapper objectMapper;
 
     protected PayloadStorage payloadStorage;
 
+    //conductor客户端配置
     protected ConductorClientConfiguration conductorClientConfiguration;
 
     protected ClientBase() {
@@ -78,6 +82,11 @@ public abstract class ClientBase {
         this(config, new DefaultConductorClientConfiguration(), handler);
     }
 
+    /** 构造函数
+     * @param config 客户端配置
+     * @param clientConfiguration Conductor客户端配置
+     * @param handler 客户端处理器
+     */
     protected ClientBase(ClientConfig config, ConductorClientConfiguration clientConfiguration, ClientHandler handler) {
         objectMapper = new JsonMapperProvider().get();
 

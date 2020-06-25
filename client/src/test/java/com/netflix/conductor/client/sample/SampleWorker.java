@@ -20,8 +20,12 @@ import com.netflix.conductor.common.metadata.tasks.Task;
 import com.netflix.conductor.common.metadata.tasks.TaskResult;
 import com.netflix.conductor.common.metadata.tasks.TaskResult.Status;
 
+/**
+ * demoWorker
+ */
 public class SampleWorker implements Worker {
 
+    //要执行的任务名称
     private String taskDefName;
 
     public SampleWorker(String taskDefName) {
@@ -33,6 +37,11 @@ public class SampleWorker implements Worker {
         return taskDefName;
     }
 
+    /**
+     * fixme 执行任务并返回结果、业务逻辑放在这里。
+     *
+     * @param task Task to be executed.
+     */
     @Override
     public TaskResult execute(Task task) {
         TaskResult result = new TaskResult(task);
@@ -42,7 +51,6 @@ public class SampleWorker implements Worker {
         result.getOutputData().put("outputKey1", "value");
         result.getOutputData().put("oddEven", 1);
         result.getOutputData().put("mod", 4);
-
         return result;
     }
 }

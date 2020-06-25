@@ -28,15 +28,18 @@ import javax.validation.constraints.NotEmpty;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * @author Viren
+ * 任务执行的结果。
+ *
  * Result of the task execution.
  */
 @ProtoMessage
 public class TaskResult {
 
+    //任务状态：处理中、失败、terminal错误、完成
     @ProtoEnum
     public enum Status {
-        IN_PROGRESS, FAILED, FAILED_WITH_TERMINAL_ERROR, COMPLETED
+        IN_PROGRESS,//If the task is not completed yet, return with the status as IN_PROGRESS.
+        FAILED, FAILED_WITH_TERMINAL_ERROR, COMPLETED
     }
 
     @NotEmpty(message = "Workflow Id cannot be null or empty")
@@ -59,6 +62,8 @@ public class TaskResult {
     @ProtoField(id = 6)
     private Status status;
 
+    //proto：原型
+    //输出结果
     @ProtoField(id = 7)
     private Map<String, Object> outputData = new HashMap<>();
 

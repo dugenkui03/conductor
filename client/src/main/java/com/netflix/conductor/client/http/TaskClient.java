@@ -212,7 +212,9 @@ public class TaskClient extends ClientBase {
     }
 
     /**
+     * 更新任务执行的结果
      * Updates the result of a task execution.
+     *
      * If the size of the task output payload is bigger than {@link ConductorClientConfiguration#getTaskOutputPayloadThresholdKB()},
      * it is uploaded to {@link ExternalPayloadStorage}, if enabled, else the task is marked as FAILED_WITH_TERMINAL_ERROR.
      *

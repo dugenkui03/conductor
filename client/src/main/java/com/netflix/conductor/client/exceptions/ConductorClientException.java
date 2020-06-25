@@ -21,6 +21,8 @@ import com.netflix.conductor.common.validation.ValidationError;
 import java.util.List;
 
 /**
+ * 客户端异常。
+ *
  * Client exception thrown from Conductor api clients.
  */
 public class ConductorClientException extends RuntimeException {
