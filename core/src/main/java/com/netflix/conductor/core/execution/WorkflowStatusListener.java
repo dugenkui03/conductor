@@ -4,7 +4,6 @@ import com.netflix.conductor.common.run.Workflow;
 
 /**
  * Listener for the completed and terminated workflows
- *
  */
 public interface WorkflowStatusListener {
     void onWorkflowCompleted(Workflow workflow);

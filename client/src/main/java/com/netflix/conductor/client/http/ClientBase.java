@@ -50,7 +50,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 /**
- * rest模板抽象的客户端
+ * rest模板 的抽象客户端
  *
  * Abstract client for the REST template
  */

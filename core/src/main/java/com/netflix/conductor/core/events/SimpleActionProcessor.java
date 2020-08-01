@@ -39,14 +39,17 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Viren
  * Action Processor subscribes to the Event Actions queue and processes the actions (e.g. start workflow etc)
+ * "动作处理器 订阅事件动作队列 和 处理动作，例如开始工作流"
  */
 public class SimpleActionProcessor implements ActionProcessor {
     private static final Logger logger = LoggerFactory.getLogger(SimpleActionProcessor.class);
 
+    //工作流执行器
     private final WorkflowExecutor executor;
     private final ParametersUtils parametersUtils;
     private final JsonUtils jsonUtils;
 
+    //todo 使用指定的构造函数初始化？
     @Inject
     public SimpleActionProcessor(WorkflowExecutor executor, ParametersUtils parametersUtils, JsonUtils jsonUtils) {
         this.executor = executor;

@@ -26,11 +26,12 @@ import com.netflix.dyno.connectionpool.TokenMapSupplier;
 import com.netflix.dyno.queues.ShardSupplier;
 import redis.clients.jedis.commands.JedisCommands;
 
+//优质的集群模块
 public class DynomiteClusterModule extends AbstractModule {
 
     @Override
     protected void configure() {
-
+        //优质配置
         bind(DynomiteConfiguration.class).to(SystemPropertiesDynomiteConfiguration.class);
         bind(JedisCommands.class).toProvider(DynomiteJedisProvider.class).asEagerSingleton();
         bind(JedisCommands.class)

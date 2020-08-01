@@ -122,6 +122,12 @@ public abstract class MySQLBaseDAO {
         }
     }
 
+    /**
+     *
+     * @param function "在事务上下文中进行操作的功能接口"
+     * @param <R> 返回值类型
+     * @return
+     */
     <R> R getWithRetriedTransactions(final TransactionalFunction<R> function) {
         try {
             return new RetryUtil<R>().retryOnException(
@@ -182,7 +188,8 @@ public abstract class MySQLBaseDAO {
     }
 
     /**
-     * Initiate a new transaction and execute a {@link Query} within that context,
+     * 初始化一个事务、并使用该上下文执行查询，然后返回function的结果。
+     * Initiate a new transaction(事务) and execute a {@link Query} within that context,
      * then return the results of {@literal function}.
      *
      * @param query    The query string to prepare.

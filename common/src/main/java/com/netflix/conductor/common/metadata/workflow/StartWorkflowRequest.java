@@ -22,6 +22,7 @@ import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 
+// fixme 开始工作流请求
 @ProtoMessage
 public class StartWorkflowRequest {
     @ProtoField(id = 1)
@@ -31,22 +32,29 @@ public class StartWorkflowRequest {
     @ProtoField(id = 2)
 	private Integer version;
 
+    // Unique Id that correlates(关联) multiple Workflow executions
+	// 关联多个工作流执行的唯一键
     @ProtoField(id = 3)
 	private String correlationId;
 
     @ProtoField(id = 4)
 	private Map<String, Object> input = new HashMap<>();
 
+    // 任务域有组于支持任务开发，理念同"任务定义相同"、任务可以在不同的域中实现。
     @ProtoField(id = 5)
 	private Map<String, String> taskToDomain = new HashMap<>();
 
+    // 工作流定义
     @ProtoField(id = 6)
     @Valid
     private WorkflowDef workflowDef;
 
+    // 只需java客户端关注
+	// https://netflix.github.io/conductor/externalpayloadstorage/
     @ProtoField(id = 7)
     private String externalInputPayloadStoragePath;
 
+    // 工作流中的任务优先级定义
 	@ProtoField(id = 8)
 	@Min(value = 0, message = "priority: ${validatedValue} should be minimum {value}")
 	@Max(value = 99, message = "priority: ${validatedValue} should be maximum {value}")
@@ -55,9 +63,11 @@ public class StartWorkflowRequest {
     public String getName() {
 		return name;
 	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
+
 	public StartWorkflowRequest withName(String name) {
 		this.name = name;
 		return this;
@@ -66,9 +76,11 @@ public class StartWorkflowRequest {
 	public Integer getVersion() {
 		return version;
 	}
+
 	public void setVersion(Integer version) {
 		this.version = version;
 	}
+
 	public StartWorkflowRequest withVersion(Integer version) {
 		this.version = version;
 		return this;

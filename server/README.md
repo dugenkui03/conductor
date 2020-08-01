@@ -1,6 +1,7 @@
 ## Usage
 
 ### Using Elasticsearch as Index Data Source
+使用Elasticsearch作为索引数据源。
 
 While it is easy to plug-in any implementations of Indexing data source, Elasticsearch implementations are readily provided.
 Configuring Elasticsearch to use with Conductor is as easy as setting up configuration parameters.

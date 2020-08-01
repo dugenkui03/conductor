@@ -18,7 +18,6 @@ package com.netflix.conductor.common.metadata.workflow;
 import com.github.vmg.protogen.annotations.ProtoField;
 import com.github.vmg.protogen.annotations.ProtoMessage;
 import com.netflix.conductor.common.metadata.tasks.TaskDef;
-import com.netflix.conductor.common.run.Workflow;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,18 +33,15 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.PositiveOrZero;
 
 /**
- * @author Viren
+ * 作为工作流定义一部分的任务定义。工作流中的任务定义作为工作流 getTasks 方法的一部分被保存。
  *
- * This is the task definition definied as part of the {@link WorkflowDef}. The tasks definied in the Workflow definition are saved
- * as part of {@link WorkflowDef#getTasks}
+ * This is the task definition defined as part of the {@link WorkflowDef}.
+ * The tasks defined in the Workflow definition are saved as part of {@link WorkflowDef#getTasks}
  */
 @ProtoMessage
 public class WorkflowTask {
 
-	/**
-	 * This field is deprecated and will be removed in the next version.
-	 * Please use {@link TaskType} instead.
-	 */
+	// 将要移除，使用TaskType替换
 	@Deprecated
 	public enum Type {
 		SIMPLE, DYNAMIC, FORK_JOIN, FORK_JOIN_DYNAMIC, DECISION, JOIN, SUB_WORKFLOW, EVENT, WAIT, USER_DEFINED;
@@ -67,26 +63,42 @@ public class WorkflowTask {
 		}
 	}
 
+	// 不可为null或者空
 	@ProtoField(id = 1)
 	@NotEmpty(message = "WorkflowTask name cannot be empty or null")
 	private String name;
 
+	// Alias used to refer the task within the workflow. MUST be unique within workflow.
+	// 用来引用工作流中任务的别名，在工作流中必须是唯一的。
 	@ProtoField(id = 2)
 	@NotEmpty(message = "WorkflowTask taskReferenceName name cannot be empty or null")
 	private String taskReferenceName;
 
+	// 描述
 	@ProtoField(id = 3)
 	private String description;
 
+	// 用来定义给定任务的入参的json模板，例如
+	// {
+	//        "fileLocation": "${workflow.input.fileLocation}"
+	// }
 	@ProtoField(id = 4)
 	private Map<String, Object> inputParameters = new HashMap<>();
 
+	// 任务类型
 	@ProtoField(id = 5)
 	private String type = TaskType.SIMPLE.name();
 
+	// Name of the parameter from the task input whose value is used to schedule the task.
+	// e.g. if the value of the parameter is ABC, the next task scheduled is of type 'ABC'.
+	// 任务中的参数名称，用来调度任务，比如如果其只是ABC，则笑一个被调度的任务就是ABC。
 	@ProtoField(id = 6)
 	private String dynamicTaskNameParam;
 
+	// https://netflix.github.io/conductor/configuration/systask/#dynamic-task
+	// A decision task is similar to case...switch statement in a programming language.
+
+	// 任务的输入名称，其值可用来作为开关。
 	@ProtoField(id = 7)
 	private String caseValueParam;
 
@@ -96,8 +108,12 @@ public class WorkflowTask {
 	@ProtoField(id = 22)
 	private String scriptExpression;
 
+	//工作流任务列表
 	@ProtoMessage(wrapper = true)
 	public static class WorkflowTaskList {
+		@ProtoField(id = 1)
+		private List<WorkflowTask> tasks;
+
 		public List<WorkflowTask> getTasks() {
 			return tasks;
 		}
@@ -105,9 +121,6 @@ public class WorkflowTask {
 		public void setTasks(List<WorkflowTask> tasks) {
 			this.tasks = tasks;
 		}
-
-		@ProtoField(id = 1)
-		private List<WorkflowTask> tasks;
 	}
 
 	//Populates for the tasks of the decision type

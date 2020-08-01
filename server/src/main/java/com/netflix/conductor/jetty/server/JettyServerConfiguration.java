@@ -2,6 +2,9 @@ package com.netflix.conductor.jetty.server;
 
 import com.netflix.conductor.core.config.Configuration;
 
+/**
+ * jetty服务配置
+ */
 public interface JettyServerConfiguration extends Configuration {
     String ENABLED_PROPERTY_NAME = "conductor.jetty.server.enabled";
     boolean ENABLED_DEFAULT_VALUE = true;

@@ -70,27 +70,51 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @author Viren Workflow services provider interface
+/**工作流服务提供者接口
+ * Workflow services provider interface
+ * @author Viren
  */
 @Trace
 public class WorkflowExecutor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WorkflowExecutor.class);
 
+    // 数据获取层：获取任务定义、工作流定义
     private final MetadataDAO metadataDAO;
+
+    // 负责任务入队
     private final QueueDAO queueDAO;
+
+    //决定者服务
     private final DeciderService deciderService;
+
+    // 配置
     private final Configuration config;
+
+    // 元数据映射服务
     private final MetadataMapperService metadataMapperService;
+
+    //Facade:外观设计模式。
+    // 扮演从ExecutionDAO、RateLimitingDAO和IndexDAO中获取数据的外观模式
     private final ExecutionDAOFacade executionDAOFacade;
+
+    // 参数工具：用来在工作流定义和任务定义中解析jsonPath的工具
     private final ParametersUtils parametersUtils;
+
+    // 工作流监听器
     private final WorkflowStatusListener workflowStatusListener;
 
     private int activeWorkerLastPollInSecs;
+
     private final int queueTaskMessagePostponeSeconds;
+
+    //"决定者队列"
     public static final String DECIDER_QUEUE = "_deciderQueue";
+
+    // 工作流执行者名称
     private static final String className = WorkflowExecutor.class.getSimpleName();
+
+    // "执行锁服务"
     private final ExecutionLockService executionLockService;
 
     @Inject
@@ -310,7 +334,8 @@ public class WorkflowExecutor {
         );
     }
 
-    /**
+    /** fixme 开始工作流
+     *
      * @throws ApplicationException
      */
     public String startWorkflow(
@@ -325,6 +350,7 @@ public class WorkflowExecutor {
             String event,
             Map<String, String> taskToDomain
     ) {
+        //
         WorkflowDef workflowDefinition = metadataMapperService.lookupForWorkflowDefinition(name, version);
 
         return startWorkflow(

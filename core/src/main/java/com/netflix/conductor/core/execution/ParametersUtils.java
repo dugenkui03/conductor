@@ -40,7 +40,8 @@ import com.netflix.conductor.common.utils.TaskUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 /**
- * Used to parse and resolve the JSONPath bindings in the workflow and task definitions.
+ * 用来在工作流定义和任务定义中解析jsonPath的工具
+ * Used to parse(解析) and resolve(解决) the JSONPath bindings(绑定) in the workflow and task definitions.
  */
 public class ParametersUtils {
     private static Logger logger = LoggerFactory.getLogger(ParametersUtils.class);

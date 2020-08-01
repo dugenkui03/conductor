@@ -75,6 +75,8 @@ import static com.netflix.conductor.common.metadata.workflow.TaskType.TASK_TYPE_
 import static com.netflix.conductor.common.metadata.workflow.TaskType.TASK_TYPE_WAIT;
 import static com.netflix.conductor.common.metadata.workflow.TaskType.TASK_TYPE_DO_WHILE;
 import static com.netflix.conductor.core.events.EventQueues.EVENT_QUEUE_PROVIDERS_QUALIFIER;
+
+
 /**
  * @author Viren
  */
@@ -85,7 +87,13 @@ public class CoreModule extends AbstractModule {
 
     @Override
     protected void configure() {
+        /** https://zhuanlan.zhihu.com/p/32299568
+         *
+         * "Singleton表示构建的对象是单例的，Inject表示被标注的字段将使用Guice自动注入"
+         */
+        //只用指定的模块处理更多的绑定
         install(MultibindingsScanner.asModule());
+        //todo
         bind(SystemTaskWorkerCoordinator.class).asEagerSingleton();
         bind(SubWorkflow.class).asEagerSingleton();
         bind(Wait.class).asEagerSingleton();
@@ -94,10 +102,14 @@ public class CoreModule extends AbstractModule {
         bind(Terminate.class).asEagerSingleton();
         bind(IsolatedTaskQueueProducer.class).asEagerSingleton();
         // start processing events when instance starts
+        // "创建示例的时候处理事件"？？
         bind(ActionProcessor.class).to(SimpleActionProcessor.class);
         bind(EventProcessor.class).to(SimpleEventProcessor.class).asEagerSingleton();
     }
 
+    // https://www.jianshu.com/p/a648322dc680
+    // "当一个对象很复杂，无法使用简单的构造器来生成的时候，我们可以使用@Provides方法，
+    // 也就是在配置类中生成一个注解了@Provides的方法。在该方法中我们可以编写任意代码来构造对象。"
     @Provides
     @Singleton
     public ParametersUtils getParameterUtils() {

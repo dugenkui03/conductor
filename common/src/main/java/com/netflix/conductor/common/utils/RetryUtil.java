@@ -66,10 +66,11 @@ public class RetryUtil<T> {
 
     private static final Logger logger = LoggerFactory.getLogger(RetryUtil.class);
 
+    // 内部的重试次数
     private AtomicInteger internalNumberOfRetries = new AtomicInteger();
 
     /**
-     * A helper method which has the ability to execute a flaky supplier function and retry in case of failures.
+     * A helper(协助者) method which has the ability to execute a flaky(不稳定) supplier(供应者) function and retry in case of failures.
      *
      * @param supplierCommand:      Any function that is flaky and needs multiple retries.
      * @param throwablePredicate:   A Guava {@link Predicate} housing the exceptional
@@ -88,10 +89,10 @@ public class RetryUtil<T> {
      *                          </ul>
      */
     @SuppressWarnings("Guava")
-    public T retryOnException(Supplier<T> supplierCommand,
-                              Predicate<Throwable> throwablePredicate,
+    public T retryOnException(Supplier<T> supplierCommand, //不稳定的函数、可能需要重试执行
+                              Predicate<Throwable> throwablePredicate, //Predicate: 断言、返回值是个boolean
                               Predicate<T> resultRetryPredicate,
-                              int retryCount,
+                              int retryCount, //重试次数
                               String shortDescription, String operationName) throws RuntimeException {
 
         Retryer<T> retryer = RetryerBuilder.<T>newBuilder()

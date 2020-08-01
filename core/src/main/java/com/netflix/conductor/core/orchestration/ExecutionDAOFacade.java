@@ -45,8 +45,10 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Service that acts as a facade for accessing execution data from the {@link ExecutionDAO}, {@link RateLimitingDAO} and {@link IndexDAO} storage layers
+/**扮演从ExecutionDAO、RateLimitingDAO和IndexDAO中获取数据的外观模式
+ *
+ * Service that acts(扮演) as a facade for accessing execution data
+ * from the {@link ExecutionDAO}, {@link RateLimitingDAO} and {@link IndexDAO} storage layers
  */
 @Singleton
 public class ExecutionDAOFacade {

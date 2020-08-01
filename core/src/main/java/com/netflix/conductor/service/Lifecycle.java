@@ -15,17 +15,21 @@ public interface Lifecycle {
 
     Logger logger = LoggerFactory.getLogger(Lifecycle.class);
 
+    //开始
     default void start() throws Exception {
         registerShutdownHook();
     }
 
+    //停止
     void stop() throws Exception;
 
+    //fixme Runtime.getRuntime().addShutdownHook：jvm关闭的时候执行hook方法。
     default void registerShutdownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
                 stop();
             } catch (Exception e) {
+                //尝试关闭 生命周期组件 的时候失败
                 logger.error("Error when trying to shutdown a lifecycle component: " + this.getClass().getName(), e);
             }
         }));

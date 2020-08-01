@@ -20,11 +20,9 @@ import com.netflix.conductor.core.events.queue.Message;
 import java.util.List;
 import java.util.Map;
 
-/**
- *
- * @author Viren
+/** 负责任务入队
  * DAO responsible for managing queuing for the tasks.
- *
+ * @author Viren
  */
 public interface QueueDAO {
 

@@ -48,14 +48,11 @@ import org.slf4j.LoggerFactory;
  */
 public class TaskClient extends ClientBase {
 
-    private static GenericType<List<Task>> taskList = new GenericType<List<Task>>() {
-    };
+    private static GenericType<List<Task>> taskList = new GenericType<List<Task>>() {};
 
-    private static GenericType<List<TaskExecLog>> taskExecLogList = new GenericType<List<TaskExecLog>>() {
-    };
+    private static GenericType<List<TaskExecLog>> taskExecLogList = new GenericType<List<TaskExecLog>>() {};
 
-    private static GenericType<List<PollData>> pollDataList = new GenericType<List<PollData>>() {
-    };
+    private static GenericType<List<PollData>> pollDataList = new GenericType<List<PollData>>() {};
 
     private static GenericType<SearchResult<TaskSummary>> searchResultTaskSummary = new GenericType<SearchResult<TaskSummary>>() {
     };

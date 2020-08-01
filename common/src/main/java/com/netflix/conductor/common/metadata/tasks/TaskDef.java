@@ -42,6 +42,10 @@ import javax.validation.constraints.NotNull;
 @Valid
 public class TaskDef extends Auditable {
 
+	// 任务超时策略：
+	// 重试
+	// TIME_OUT_WF：Workflow 工作流别标识为超时、并终止
+	// ALERT_ONLY: Registers a counter (task_timeout)
 	@ProtoEnum
 	public enum TimeoutPolicy {RETRY, TIME_OUT_WF, ALERT_ONLY}
 
@@ -50,24 +54,32 @@ public class TaskDef extends Auditable {
 
 	private static final int ONE_HOUR = 60 * 60;
 
-	/**
-	 * Unique name identifying the task.  The name is unique across
-	 */
+	// fixme name是唯一的，用于标识任务。唯一、唯一、唯一、唯一、唯一
 	@NotEmpty(message = "TaskDef name cannot be null or empty")
 	@ProtoField(id = 1)
 	private String name;
 
+	// 描述任务
 	@ProtoField(id = 2)
 	private String description;
 
+	// 任务执行失败的时候、重试的次数，必须大于等于0
 	@ProtoField(id = 3)
 	@Min(value = 0, message = "TaskDef retryCount: {value} must be >= 0")
 	private int retryCount = 3; // Default
 
+	// 超时时间
 	@ProtoField(id = 4)
 	@NotNull
 	private long timeoutSeconds;
 
+	/** inputKeys 和 outputKeys是任务的输入和输出值。参考：
+	 *
+	 *  https://netflix.github.io/conductor/configuration/taskdef/#using-inputkeys-and-outputkeys
+	 */
+
+	// 输入的键值列表，用户记录任务的输入。
+	// "Array of keys of task's expected input. Used for documenting task's input"
 	@ProtoField(id = 5)
 	private List<String> inputKeys = new ArrayList<String>();
 
@@ -77,19 +89,28 @@ public class TaskDef extends Auditable {
 	@ProtoField(id = 7)
 	private TimeoutPolicy timeoutPolicy = TimeoutPolicy.TIME_OUT_WF;
 
+	// 重试机制：
+	// FIXED：Reschedule the task after the retryDelaySeconds
+	// EXPONENTIAL_BACKOFF：reschedule after retryDelaySeconds  * attemptNumber
 	@ProtoField(id = 8)
 	private RetryLogic retryLogic = RetryLogic.FIXED;
 
+	// 重试延迟时间
 	@ProtoField(id = 9)
 	private int retryDelaySeconds = 60;
 
+	// 0 < this < timeoutSeconds，默认3600s；
+	// "如果在指定时间内没有更新状态，则会重新安排(schedule)任务，"
+	// 在worker轮询任务但是遇到错误的时候很有用
 	@ProtoField(id = 10)
 	@Min(value = 1, message = "TaskDef responseTimeoutSeconds: ${validatedValue} should be minimum {value} second")
 	private long responseTimeoutSeconds = ONE_HOUR;
 
+	// 当前可执行的任务数量
 	@ProtoField(id = 11)
 	private Integer concurrentExecLimit;
 
+	//https://netflix.github.io/conductor/configuration/taskdef/#using-inputtemplate
 	@ProtoField(id = 12)
 	private Map<String, Object> inputTemplate = new HashMap<>();
 
@@ -97,15 +118,28 @@ public class TaskDef extends Auditable {
 	//	@ProtoField(id = 13)
 	//	private Integer rateLimitPerSecond;
 
+	/** https://netflix.github.io/conductor/configuration/taskdef/#task-rate-limits  rate:比率
+	 *
+	 * 和rateLimitFrequencyInSeconds共用、定义了在 频率窗口 可提交给worker的任务数量；
+	 * rateLimitFrequencyInSeconds设置频率窗口，例如1s, 5s, 60s, 300s。
+	 */
 	@ProtoField(id = 14)
 	private Integer rateLimitPerFrequency;
 
 	@ProtoField(id = 15)
 	private Integer rateLimitFrequencyInSeconds;
 
+	/** https://netflix.github.io/conductor/configuration/isolationgroups/#isolation-group-id
+	 *  piles up：堆积
+	 *
+	 * 对于延迟较高的任务，使用单独的队列和线程池去执行这些任务，避免影响到其他任务。
+	 */
 	@ProtoField(id = 16)
 	private String isolationGroupId;
 
+	/**https://netflix.github.io/conductor/configuration/isolationgroups/#execution-name-space
+	 *
+	 */
 	@ProtoField(id = 17)
 	private String executionNameSpace;
 
@@ -118,8 +152,10 @@ public class TaskDef extends Auditable {
 	@Min(value = 0, message = "TaskDef pollTimeoutSeconds: {value} must be >= 0")
 	private Integer pollTimeoutSeconds;
 
-	public TaskDef() {
-	}
+	/**
+	 * ======================================== 构造函数 =================================================
+	 */
+	public TaskDef() { }
 
 	public TaskDef(String name) {
 		this.name = name;
@@ -137,8 +173,7 @@ public class TaskDef extends Auditable {
 		this.timeoutSeconds = timeoutSeconds;
 	}
 
-	public TaskDef(String name, String description, String ownerEmail, int retryCount,
-		long timeoutSeconds, long responseTimeoutSeconds) {
+	public TaskDef(String name, String description, String ownerEmail, int retryCount, long timeoutSeconds, long responseTimeoutSeconds) {
 		this.name = name;
 		this.description = description;
 		this.ownerEmail = ownerEmail;
@@ -147,179 +182,107 @@ public class TaskDef extends Auditable {
 		this.responseTimeoutSeconds = responseTimeoutSeconds;
 	}
 
-	/**
-	 * @return the name
-	 */
+
+
+	// 唯一键
 	public String getName() {
 		return name;
 	}
 
-	/**
-	 * @param name the name to set
-	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
-	/**
-	 * @return the description
-	 */
 	public String getDescription() {
 		return description;
 	}
 
-	/**
-	 * @param description the description to set
-	 */
 	public void setDescription(String description) {
 		this.description = description;
 	}
 
-	/**
-	 * @return the retryCount
-	 */
 	public int getRetryCount() {
 		return retryCount;
 	}
 
-	/**
-	 * @param retryCount the retryCount to set
-	 */
 	public void setRetryCount(int retryCount) {
 		this.retryCount = retryCount;
 	}
 
-	/**
-	 * @return the timeoutSeconds
-	 */
 	public long getTimeoutSeconds() {
 		return timeoutSeconds;
 	}
 
-	/**
-	 * @param timeoutSeconds the timeoutSeconds to set
-	 */
 	public void setTimeoutSeconds(long timeoutSeconds) {
 		this.timeoutSeconds = timeoutSeconds;
 	}
 
-	/**
-	 *
-	 * @return Returns the input keys
-	 */
 	public List<String> getInputKeys() {
 		return inputKeys;
 	}
 
-	/**
-	 * @param inputKeys Set of keys that the task accepts in the input map
-	 */
 	public void setInputKeys(List<String> inputKeys) {
 		this.inputKeys = inputKeys;
 	}
 
-	/**
-	 * @return Returns the output keys for the task when executed
-	 */
 	public List<String> getOutputKeys() {
 		return outputKeys;
 	}
 
-	/**
-	 * @param outputKeys Sets the output keys
-	 */
 	public void setOutputKeys(List<String> outputKeys) {
 		this.outputKeys = outputKeys;
 	}
 
 
-	/**
-	 * @return the timeoutPolicy
-	 */
 	public TimeoutPolicy getTimeoutPolicy() {
 		return timeoutPolicy;
 	}
 
-	/**
-	 * @param timeoutPolicy the timeoutPolicy to set
-	 */
 	public void setTimeoutPolicy(TimeoutPolicy timeoutPolicy) {
 		this.timeoutPolicy = timeoutPolicy;
 	}
 
-	/**
-	 * @return the retryLogic
-	 */
 	public RetryLogic getRetryLogic() {
 		return retryLogic;
 	}
 
-	/**
-	 * @param retryLogic the retryLogic to set
-	 */
 	public void setRetryLogic(RetryLogic retryLogic) {
 		this.retryLogic = retryLogic;
 	}
 
-	/**
-	 * @return the retryDelaySeconds
-	 */
 	public int getRetryDelaySeconds() {
 		return retryDelaySeconds;
 	}
 
-	/**
-	 *
-	 * @return the timeout for task to send response.  After this timeout, the task will be re-queued
-	 */
+	// 任务发送响应的超时时间，超过该时间、任务将会被重新入队。
 	public long getResponseTimeoutSeconds() {
 		return responseTimeoutSeconds;
 	}
 
-	/**
-	 *
-	 * @param responseTimeoutSeconds - timeout for task to send response.  After this timeout, the task will be re-queued
-	 */
 	public void setResponseTimeoutSeconds(long responseTimeoutSeconds) {
 		this.responseTimeoutSeconds = responseTimeoutSeconds;
 	}
 
-	/**
-	 * @param retryDelaySeconds the retryDelaySeconds to set
-	 */
 	public void setRetryDelaySeconds(int retryDelaySeconds) {
 		this.retryDelaySeconds = retryDelaySeconds;
 	}
 
-	/**
-	 * @return the inputTemplate
-	 */
 	public Map<String, Object> getInputTemplate() {
 		return inputTemplate;
 	}
 
-
-	/**
-	 *
-	 * @return rateLimitPerFrequency The max number of tasks that will be allowed to be executed per rateLimitFrequencyInSeconds.
-	 */
+	// The max number of tasks that will be allowed to be executed per rateLimitFrequencyInSeconds.
 	public Integer getRateLimitPerFrequency() {
 		return rateLimitPerFrequency == null ? 0 : rateLimitPerFrequency;
 	}
 
-	/**
-	 *
-	 * @param rateLimitPerFrequency The max number of tasks that will be allowed to be executed per rateLimitFrequencyInSeconds.
-	 *                                 Setting the value to 0 removes the rate limit
-	 */
+	// The max number of tasks that will be allowed to be executed per rateLimitFrequencyInSeconds.
+	// Setting the value to 0 removes the rate limit
 	public void setRateLimitPerFrequency(Integer rateLimitPerFrequency) {
 		this.rateLimitPerFrequency = rateLimitPerFrequency;
 	}
 
-	/**
-	 * @return rateLimitFrequencyInSeconds: The time bucket that is used to rate limit tasks based on {@link #getRateLimitPerFrequency()}
-	 * If null or not set, then defaults to 1 second
-	 */
+	// 默认值为1：The time bucket that is used to rate limit tasks based on {@link #getRateLimitPerFrequency()}
 	public Integer getRateLimitFrequencyInSeconds() {
 		return rateLimitFrequencyInSeconds == null ? 1 : rateLimitFrequencyInSeconds;
 	}

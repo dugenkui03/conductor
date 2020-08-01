@@ -16,45 +16,58 @@ import com.google.inject.AbstractModule;
 import java.util.List;
 import java.util.Map;
 
-/**
+/**fixme 接口中的变量都是 public static final、可省略这些修饰。只有getter方法、实现类可以重写set逻辑
  * @author Viren
  */
 public interface Configuration {
+
+    //DB名称和默认值
     String DB_PROPERTY_NAME = "db";
     String DB_DEFAULT_VALUE = "memory";
 
+    //扫描频率属性名称、频率默认值
     String SWEEP_FREQUENCY_PROPERTY_NAME = "decider.sweep.frequency.seconds";
     int SWEEP_FREQUENCY_DEFAULT_VALUE = 30;
 
+    //禁止扫描属性名称、默认值
     String SWEEP_DISABLE_PROPERTY_NAME = "decider.sweep.disable";
     // FIXME This really should be typed correctly.
     String SWEEP_DISABLE_DEFAULT_VALUE = "false";
 
+    //不允许异步worker
     String DISABLE_ASYNC_WORKERS_PROPERTY_NAME = "conductor.disable.async.workers";
     // FIXME This really should be typed correctly.
     String DISABLE_ASYNC_WORKERS_DEFAULT_VALUE = "false";
 
+    //系统worker线程
     String SYSTEM_TASK_WORKER_THREAD_COUNT_PROPERTY_NAME = "workflow.system.task.worker.thread.count";
     int SYSTEM_TASK_WORKER_THREAD_COUNT_DEFAULT_VALUE = 10;
 
+    //worker回调second
     String SYSTEM_TASK_WORKER_CALLBACK_SECONDS_PROPERTY_NAME = "workflow.system.task.worker.callback.seconds";
     int SYSTEM_TASK_WORKER_CALLBACK_SECONDS_DEFAULT_VALUE = 30;
 
+    //轮询(poll)间隔
     String SYSTEM_TASK_WORKER_POLL_INTERVAL_PROPERTY_NAME = "workflow.system.task.worker.poll.interval";
     int SYSTEM_TASK_WORKER_POLL_INTERVAL_DEFAULT_VALUE = 50;
 
+    //执行命名空间
     String SYSTEM_TASK_WORKER_EXECUTION_NAMESPACE_PROPERTY_NAME = "workflow.system.task.worker.executionNameSpace";
     String SYSTEM_TASK_WORKER_EXECUTION_NAMESPACE_DEFAULT_VALUE = "";
 
+    //独立的系统任务worker线程
     String SYSTEM_TASK_WORKER_ISOLATED_THREAD_COUNT_PROPERTY_NAME = "workflow.isolated.system.task.worker.thread.count";
     int SYSTEM_TASK_WORKER_ISOLATED_THREAD_COUNT_DEFAULT_VALUE = 1;
 
+    //系统任务队列轮询数量
     String SYSTEM_TASK_MAX_POLL_COUNT_PROPERTY_NAME = "workflow.system.task.queue.pollCount";
     int SYSTEM_TASK_MAX_POLL_COUNT_DEFAULT_VALUE = 1;
 
+    //环境：默认测试环境
     String ENVIRONMENT_PROPERTY_NAME = "environment";
     String ENVIRONMENT_DEFAULT_VALUE = "test";
 
+    // 堆栈/协议
     String STACK_PROPERTY_NAME = "STACK";
     String STACK_DEFAULT_VALUE = "test";
 

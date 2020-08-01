@@ -45,9 +45,11 @@ public class JettyServer implements Lifecycle {
 
     private static Logger logger = LoggerFactory.getLogger(JettyServer.class);
 
+    //端口
     private final int port;
     private final boolean join;
 
+    //jetty服务、组合
     private Server server;
 
 
@@ -59,18 +61,21 @@ public class JettyServer implements Lifecycle {
 
     @Override
     public synchronized void start() throws Exception {
-
+        //如果服务已经在运行了
         if (server != null) {
             throw new IllegalStateException("Server is already running");
         }
 
+        //指定端口新建jetty服务
         this.server = new Server(port);
 
-        ServletContextHandler context = new ServletContextHandler();
-        context.addFilter(GuiceFilter.class, "/*", EnumSet.allOf(DispatcherType.class));
-        context.setWelcomeFiles(new String[]{"index.html"});
+        //servlet上下文处理器、还是jetty的东西
+        ServletContextHandler contextHandler = new ServletContextHandler();
+        //拦截路径
+        contextHandler.addFilter(GuiceFilter.class, "/*", EnumSet.allOf(DispatcherType.class));
+        contextHandler.setWelcomeFiles(new String[]{"index.html"});
 
-        server.setHandler(context);
+        server.setHandler(contextHandler);
         if (getBoolean("enableJMX")) {
             System.out.println("configure MBean container...");
             configureMBeanContainer(server);

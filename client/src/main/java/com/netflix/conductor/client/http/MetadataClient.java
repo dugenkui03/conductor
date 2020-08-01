@@ -30,51 +30,39 @@ import org.apache.commons.lang.StringUtils;
 
 import java.util.List;
 
+//元数据客户端：注册工作流定义、任务定义等
 public class MetadataClient extends ClientBase {
 
-    private static GenericType<List<WorkflowDef>> workflowDefList = new GenericType<List<WorkflowDef>>() {
-    };
+    // 工作流 定义列表
+    private static GenericType<List<WorkflowDef>> workflowDefList = new GenericType<List<WorkflowDef>>() {};
 
-    private static GenericType<List<TaskDef>> taskDefList = new GenericType<List<TaskDef>>() {
-    };
+    // 任务定义列表
+    private static GenericType<List<TaskDef>> taskDefList = new GenericType<List<TaskDef>>() {};
 
     /**
-     * Creates a default metadata client
+     * ======================= 构造函数 ======================
      */
+    // 创建一个默认的元数据定义 Creates a default metadata client
     public MetadataClient() {
         this(new DefaultClientConfig(), new DefaultConductorClientConfiguration(), null);
     }
 
-    /**
-     * @param clientConfig REST Client configuration
-     */
+    // rest客户端配置：REST Client configuration
     public MetadataClient(ClientConfig clientConfig) {
         this(clientConfig, new DefaultConductorClientConfiguration(), null);
     }
 
-    /**
-     * @param clientConfig  REST Client configuration
-     * @param clientHandler Jersey client handler. Useful when plugging in various http client interaction modules (e.g. ribbon)
-     */
+    // clientHandler：Useful when plugging(插入) in various(各种个样的) http client interaction modules
     public MetadataClient(ClientConfig clientConfig, ClientHandler clientHandler) {
         this(clientConfig, new DefaultConductorClientConfiguration(), clientHandler);
     }
 
-    /**
-     * @param config  config REST Client configuration
-     * @param handler handler Jersey client handler. Useful when plugging in various http client interaction modules (e.g. ribbon)
-     * @param filters Chain of client side filters to be applied per request
-     */
+    // filters 应用到每个请求的客户端过滤链 Chain of client side filters to be applied per request
     public MetadataClient(ClientConfig config, ClientHandler handler, ClientFilter... filters) {
         this(config, new DefaultConductorClientConfiguration(), handler, filters);
     }
 
-    /**
-     * @param config              REST Client configuration
-     * @param clientConfiguration Specific properties configured for the client, see {@link ConductorClientConfiguration}
-     * @param handler             Jersey client handler. Useful when plugging in various http client interaction modules (e.g. ribbon)
-     * @param filters             Chain of client side filters to be applied per request
-     */
+    // clientConfiguration 配置到client的特定的属性
     public MetadataClient(ClientConfig config, ConductorClientConfiguration clientConfiguration, ClientHandler handler, ClientFilter... filters) {
         super(config, clientConfiguration, handler);
         for (ClientFilter filter : filters) {
@@ -83,92 +71,59 @@ public class MetadataClient extends ClientBase {
     }
 
 
-    // Workflow Metadata Operations
-
     /**
-     * Register a workflow definition with the server
-     *
-     * @param workflowDef the workflow definition
+     * ======================= Workflow Metadata Operations 工作流元数据操作 ======================
      */
+    // Register a workflow definition with the server
+    // 注册工作流定义
     public void registerWorkflowDef(WorkflowDef workflowDef) {
         Preconditions.checkNotNull(workflowDef, "Worfklow definition cannot be null");
         postForEntityWithRequestOnly("metadata/workflow", workflowDef);
     }
 
-    /**
-     * Updates a list of existing workflow definitions
-     *
-     * @param workflowDefs List of workflow definitions to be updated
-     */
+    // 更新工作流定义
     public void updateWorkflowDefs(List<WorkflowDef> workflowDefs) {
         Preconditions.checkNotNull(workflowDefs, "Workflow defs list cannot be null");
         put("metadata/workflow", null, workflowDefs);
     }
 
-    /**
-     * Retrieve the workflow definition
-     *
-     * @param name    the name of the workflow
-     * @param version the version of the workflow def
-     * @return Workflow definition for the given workflow and version
-     */
+    // 获取(retrieve)指定名称和版本的工作流定义
     public WorkflowDef getWorkflowDef(String name, Integer version) {
         Preconditions.checkArgument(StringUtils.isNotBlank(name), "name cannot be blank");
         return getForEntity("metadata/workflow/{name}", new Object[]{"version", version}, WorkflowDef.class, name);
     }
 
-    /**
-     * Removes the workflow definition of a workflow from the conductor server.
-     * It does not remove associated workflows. Use with caution.
-     *
-     * @param name    Name of the workflow to be unregistered.
-     * @param version Version of the workflow definition to be unregistered.
-     */
+    // 从conductor服务中移除 指定名称和version 的工作流定义，并不移除相关的工作流，小心使用。
     public void unregisterWorkflowDef(String name, Integer version) {
         Preconditions.checkArgument(StringUtils.isNotBlank(name), "Workflow name cannot be blank");
         Preconditions.checkNotNull(version, "Version cannot be null");
         delete("metadata/workflow/{name}/{version}", name, version);
     }
 
-    // Task Metadata Operations
 
     /**
-     * Registers a list of task types with the conductor server
-     *
-     * @param taskDefs List of task types to be registered.
+     * ======================= Task Metadata Operations 任务元数据操作 ======================
      */
+    //fixme 注册一个任务列表 Registers a list of task types with the conductor server
     public void registerTaskDefs(List<TaskDef> taskDefs) {
         Preconditions.checkNotNull(taskDefs, "Task defs list cannot be null");
+        // 接口metadata/taskdefs 参见 JettyServer
         postForEntityWithRequestOnly("metadata/taskdefs", taskDefs);
     }
 
-    /**
-     * Updates an existing task definition
-     *
-     * @param taskDef the task definition to be updated
-     */
+    // 更新一个已经存在的任务定义
     public void updateTaskDef(TaskDef taskDef) {
         Preconditions.checkNotNull(taskDef, "Task definition cannot be null");
         put("metadata/taskdefs", null, taskDef);
     }
 
-    /**
-     * Retrieve the task definition of a given task type
-     *
-     * @param taskType type of task for which to retrieve the definition
-     * @return Task Definition for the given task type
-     */
+    // 检索指定类型的任务定义，taskType对应哪个字段？
     public TaskDef getTaskDef(String taskType) {
         Preconditions.checkArgument(StringUtils.isNotBlank(taskType), "Task type cannot be blank");
         return getForEntity("metadata/taskdefs/{tasktype}", null, TaskDef.class, taskType);
     }
 
-    /**
-     * Removes the task definition of a task type from the conductor server.
-     * Use with caution.
-     *
-     * @param taskType Task type to be unregistered.
-     */
+    // 从conductor中移除任务定义
     public void unregisterTaskDef(String taskType) {
         Preconditions.checkArgument(StringUtils.isNotBlank(taskType), "Task type cannot be blank");
         delete("metadata/taskdefs/{tasktype}", taskType);

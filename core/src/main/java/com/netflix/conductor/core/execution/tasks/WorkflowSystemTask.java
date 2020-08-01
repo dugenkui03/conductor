@@ -27,10 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- * @author Viren
- *
- */
+// 工作流系统任务
 public class WorkflowSystemTask {
 
 	private static Map<String, WorkflowSystemTask> registry = new HashMap<>();

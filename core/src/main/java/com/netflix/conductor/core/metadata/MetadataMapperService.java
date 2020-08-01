@@ -39,10 +39,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Populates metadata definitions within workflow objects.
+ * <p>
+ * Populates(填入) metadata definitions within workflow objects.
  * Benefits of loading and populating metadata definitions upfront could be:
- * - Immutable definitions within a workflow execution with the added benefit of guaranteeing consistency at runtime.
- * - Stress is reduced on the storage layer
+ * <li>Immutable definitions within a workflow execution with the added benefit of guaranteeing consistency at runtime.</li>
+ * <li> Stress is reduced on the storage layer </li>
+ * </p>
  */
 @Singleton
 public class MetadataMapperService {
@@ -56,11 +58,13 @@ public class MetadataMapperService {
         this.metadataDAO = metadataDAO;
     }
 
+    //查找指定名称和版本的工作流定义
     public WorkflowDef lookupForWorkflowDefinition(String name, Integer version) {
-        Optional<WorkflowDef> potentialDef =
-                version == null ? lookupLatestWorkflowDefinition(name) : lookupWorkflowDefinition(name, version);
+        //如果版本为null、则查找指定名称的工作流，否则查找指定版本的工作流
+        Optional<WorkflowDef> potentialDef = version == null ? lookupLatestWorkflowDefinition(name) : lookupWorkflowDefinition(name, version);
 
-        //Check if the workflow definition is valid
+        // Check if the workflow definition is valid
+        // 如果Optional中没有获取到到工作流定义
         WorkflowDef workflowDefinition = potentialDef
                 .orElseThrow(() -> {
                             logger.error("There is no workflow defined with name {} and version {}", name, version);
@@ -79,6 +83,7 @@ public class MetadataMapperService {
         return metadataDAO.getWorkflowDef(workflowName, workflowVersion);
     }
 
+    // VisibleForTesting：虽然不是public方法，但是可以在测试中获取、拓展了该方法在测试返回内的可见性
     @VisibleForTesting
     Optional<WorkflowDef> lookupLatestWorkflowDefinition(String workflowName) {
         Preconditions.checkArgument(StringUtils.isNotBlank(workflowName), "Workflow name must be specified when searching for a definition");

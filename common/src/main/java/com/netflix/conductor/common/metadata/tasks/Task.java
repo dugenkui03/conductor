@@ -426,8 +426,10 @@ public class Task {
         this.retried = retried;
     }
 
-    /**
-     * @return True if the task has completed its lifecycle within conductor (from start to completion to being updated in the datastore)
+    /**如果完成了在conductor中的生命周期、返回true：从开始到结束、再到存储层的更新。
+     *
+     * @return True if the task has completed its lifecycle within conductor
+     * (from start to completion to being updated in the datastore)
      */
     public boolean isExecuted() {
         return executed;

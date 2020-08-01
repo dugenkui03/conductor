@@ -21,68 +21,47 @@ import java.util.List;
 import java.util.Optional;
 
 /**
+ * 数据获取层：获取任务定义、工作流定义
  * Data access layer for the workflow metadata - task definitions and workflow definitions
  */
 public interface MetadataDAO {
 
     /**
-     * @param taskDef task definition to be created
+     * ================================== 任务定义 ==============================================
      */
+    // 创建任务定义
     void createTaskDef(TaskDef taskDef);
 
-    /**
-     * @param taskDef task definition to be updated.
-     * @return name of the task definition
-     */
+    // 更新任务定义
     String updateTaskDef(TaskDef taskDef);
 
-    /**
-     * @param name Name of the task
-     * @return Task Definition
-     */
+    //获取指定名称的任务定义
     TaskDef getTaskDef(String name);
 
-    /**
-     * @return All the task definitions
-     */
+    //获取所有任务定义
     List<TaskDef> getAllTaskDefs();
 
-    /**
-     * @param name Name of the task
-     */
+    //移除任务定义
     void removeTaskDef(String name);
 
     /**
-     * @param def workflow definition
+     * ================================== 工作流定义 ==============================================
      */
+    // 创建工作流
     void createWorkflowDef(WorkflowDef def);
 
-    /**
-     * @param def workflow definition
-     */
+    // 更新工作流
     void updateWorkflowDef(WorkflowDef def);
 
-    /**
-     * @param name Name of the workflow
-     * @return Workflow Definition
-     */
+    // 根据名称获取最新的工作流定义
     Optional<WorkflowDef> getLatestWorkflowDef(String name);
 
-    /**
-     * @param name Name of the workflow
-     * @param version version
-     * @return workflow definition
-     */
+    // 获取指定名称和版本的工作流定义？
     Optional<WorkflowDef> getWorkflowDef(String name, int version);
 
-    /**
-     * @param name Name of the workflow definition to be removed
-     * @param version Version of the workflow definition to be removed
-     */
+    // 移除指定名称和版本的工作流定义
     void removeWorkflowDef(String name, Integer version);
 
-    /**
-     * @return List of all the workflow definitions
-     */
+    // 获取所有的工作流定义
     List<WorkflowDef> getAllWorkflowDefs();
 }

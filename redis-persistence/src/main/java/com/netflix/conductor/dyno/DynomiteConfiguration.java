@@ -14,23 +14,33 @@ package com.netflix.conductor.dyno;
 
 import com.netflix.conductor.core.config.Configuration;
 
+//优质 配置
 public interface DynomiteConfiguration extends Configuration {
     // FIXME Are cluster and cluster name really different things?
+    // FIXME 集群和集群名字有必要做区分吗
+
+    //集群
     String CLUSTER_PROPERTY_NAME = "workflow.dynomite.cluster";
     String CLUSTER_DEFAULT_VALUE = null;
 
+    //集群名称
     String CLUSTER_NAME_PROPERTY_NAME = "workflow.dynomite.cluster.name";
     String HOSTS_PROPERTY_NAME = "workflow.dynomite.cluster.hosts";
 
+    //每个主机最大链接数？
     String MAX_CONNECTIONS_PER_HOST_PROPERTY_NAME = "workflow.dynomite.connection.maxConnsPerHost";
     int MAX_CONNECTIONS_PER_HOST_DEFAULT_VALUE = 10;
 
+    // 队列前缀：命名空间
     String ROOT_NAMESPACE_PROPERTY_NAME = "workflow.namespace.queue.prefix";
     String ROOT_NAMESPACE_DEFAULT_VALUE = null;
 
+    //dyno：功率计
+    //dynomite：优质的、极好的
     String DOMAIN_PROPERTY_NAME = "workflow.dyno.keyspace.domain";
     String DOMAIN_DEFAULT_VALUE = null;
 
+    //quorum：仲裁集、法定人数
     String NON_QUORUM_PORT_PROPERTY_NAME = "queues.dynomite.nonQuorum.port";
     int NON_QUORUM_PORT_DEFAULT_VALUE = 22122;
 

@@ -4,9 +4,9 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
- * Functional interface for operations within a transactional context.
+ * "在事务上下文中进行操作的功能接口"
  *
- * @author mustafa
+ * Functional interface for operations within a transactional context.
  */
 @FunctionalInterface
 public interface TransactionalFunction<R> {

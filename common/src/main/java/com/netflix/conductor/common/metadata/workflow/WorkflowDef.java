@@ -36,28 +36,32 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 
-/**
- * @author Viren
- *
- */
 @ProtoMessage
 @TaskReferenceNameUniqueConstraint
 public class WorkflowDef extends Auditable {
 
+	// 任务超时策略：
+	// 重试
+	// TIME_OUT_WF：Workflow 工作流别标识为超时、并终止
+	// ALERT_ONLY: Registers a counter (task_timeout)
 	@ProtoEnum
 	public enum TimeoutPolicy {TIME_OUT_WF, ALERT_ONLY}
 
+	// 不可为空或者null
     @NotEmpty(message = "WorkflowDef name cannot be null or empty")
     @ProtoField(id = 1)
 	@NoSemiColonConstraint(message = "Workflow name cannot contain the following set of characters: ':'")
 	private String name;
 
+	// 工作流描述
 	@ProtoField(id = 2)
 	private String description;
 
+	// 工作流版本
 	@ProtoField(id = 3)
 	private int version = 1;
 
+	//
 	@ProtoField(id = 4)
     @NotNull
     @NotEmpty(message = "WorkflowTask list cannot be empty")
