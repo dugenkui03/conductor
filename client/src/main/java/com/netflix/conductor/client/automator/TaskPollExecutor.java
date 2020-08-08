@@ -40,7 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 任务轮询执行器：管理worker来执行和服务交流的线程池（轮询和任务更新）
+ * 管理worker使用的线程池，用来轮询server、server交流、轮询任务等。
  *
  * Manages the threadPool used by the workers for execution and server communication (polling and task update).
  */

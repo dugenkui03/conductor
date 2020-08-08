@@ -26,7 +26,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-/**
+/** 通过注册的Worker配置 自动轮询和执行任务。
  * Configures automated polling(轮询) of tasks and execution via the registered {@link Worker}s.
  */
 public class TaskRunnerConfigurer {
@@ -77,36 +77,28 @@ public class TaskRunnerConfigurer {
             this.workers = workers;
         }
 
-        /**
-         * @param workerNamePrefix prefix to be used for worker names, defaults to workflow-worker- if not supplied.
-         * @return Returns the current instance.
-         */
+        // worker名称的前缀、如果没有提供使用"workflow-worker-"作为默认值
         public Builder withWorkerNamePrefix(String workerNamePrefix) {
             this.workerNamePrefix = workerNamePrefix;
             return this;
         }
 
-        /**
-         * @param sleepWhenRetry time in milliseconds, for which the thread should sleep when task update call fails,
-         *                       before retrying the operation.
-         * @return Returns the current instance.
-         */
+        // 当任务状态更新为失败的时候，任务重试之前、线程sleep的毫秒数
+        // ime in milliseconds, for which the thread should sleep when task update call fails, before retrying the operation.
         public Builder withSleepWhenRetry(int sleepWhenRetry) {
             this.sleepWhenRetry = sleepWhenRetry;
             return this;
         }
 
-        /**
-         * @param updateRetryCount number of times to retry the failed updateTask operation
-         * @return Builder instance
-         * @see #withSleepWhenRetry(int)
-         */
+        // 失败的"更新任务"操作的重试次数。
+        // number of times to retry the failed updateTask operation
         public Builder withUpdateRetryCount(int updateRetryCount) {
             this.updateRetryCount = updateRetryCount;
             return this;
         }
 
         /**
+         * worker线程的数量，应该只是为taskWorkers的数量、来避免线程饥饿。
          * @param threadCount # of threads assigned to the workers. Should be at-least the size of taskWorkers to avoid
          *                    starvation in a busy system.
          * @return Builder instance
@@ -119,7 +111,7 @@ public class TaskRunnerConfigurer {
             return this;
         }
 
-        /**
+        /**用来识别服务器是否会被发现：当服务无法被发现的时候、轮询停止；如果返回null、"服务发现检测"则不停止。
          * @param eurekaClient Eureka client - used to identify if the server is in discovery or not.  When the server
          *                     goes out of discovery, the polling is terminated. If passed null, discovery check is not
          *                     done.
@@ -170,23 +162,36 @@ public class TaskRunnerConfigurer {
         return workerNamePrefix;
     }
 
-    /**
-     * Starts the polling. Must be called after {@link TaskRunnerConfigurer.Builder#build()} method.
-     */
+    // fixme 学习：怎么使用配置的、怎么完成了conductor的服务模型
+    //  创建完实例之后，开始轮询、以及执行任务。
     public synchronized void init() {
+        // 增加初始化数
         MetricsContainer.incrementInitializationCount(this.getClass().getCanonicalName());
-        this.taskPollExecutor = new TaskPollExecutor(eurekaClient, taskClient, threadCount,
-            updateRetryCount, workerNamePrefix);
 
+        //fixme 任务轮询执行器
+        this.taskPollExecutor = new TaskPollExecutor(
+                eurekaClient,
+                taskClient,
+                threadCount,
+                updateRetryCount,
+                workerNamePrefix);
+
+        //初始化一个固定任务线程池
         this.scheduledExecutorService = Executors.newScheduledThreadPool(workers.size());
-        workers.forEach(
-            worker -> scheduledExecutorService.scheduleWithFixedDelay(() -> taskPollExecutor.pollAndExecute(worker),
-                worker.getPollingInterval(), worker.getPollingInterval(), TimeUnit.MILLISECONDS));
+
+        // fixme 对于每一个woker都有一个 taskPollExecutor(任务轮询执行器) 进行驱动
+        for (Worker worker : workers) {
+            scheduledExecutorService.scheduleWithFixedDelay(
+                    () -> taskPollExecutor.pollAndExecute(worker),
+                    worker.getPollingInterval(),//server轮询工作任务的间隔
+                    worker.getPollingInterval(),
+                    TimeUnit.MILLISECONDS);
+        }
     }
 
     /**
-     * Invoke this method within a PreDestroy block within your application to facilitate a graceful shutdown of your
-     * worker, during process termination.
+     * Invoke this method within a PreDestroy(销毁方法) block within your application
+     * to facilitate(促进) a graceful(优美的、平滑的) shutdown of your worker, during process termination.
      */
     public void shutdown() {
         taskPollExecutor.shutdownExecutorService(scheduledExecutorService);

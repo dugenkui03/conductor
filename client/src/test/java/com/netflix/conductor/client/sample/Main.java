@@ -37,10 +37,13 @@ public class Main {
         Worker worker1 = new SampleWorker("task_1");
         Worker worker2 = new SampleWorker("task_5");
 
-        // Create TaskRunnerConfigurer
-        TaskRunnerConfigurer configurer = new TaskRunnerConfigurer.Builder(taskClient, Arrays.asList(worker1, worker2))
-            .withThreadCount(threadCount)
-            .build();
+        /** TaskRunnerConfigurer：通过注册的Worker配置 自动轮询和执行任务
+         *  https://netflix.github.io/conductor/gettingstarted/client/#taskrunnerconfigurer
+         *
+         * 1. configurer中的worker1和worker2一直轮询server、执行任务，任务执行逻辑见SampleWorker；
+         * 2. threadCount：默认3。
+         */
+        TaskRunnerConfigurer configurer = new TaskRunnerConfigurer.Builder(taskClient, Arrays.asList(worker1, worker2)).withThreadCount(threadCount).build();
 
         // Start the polling and execution of tasks
         configurer.init();

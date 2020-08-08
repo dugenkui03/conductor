@@ -1,8 +1,9 @@
 ## Definitions (aka Metadata or Blueprints)
 Conductor definitions are like class definitions in OOP paradigm, or templates. You define this once, and use for each workflow execution. Definitions to Executions have 1:N relationship.
 
-## Tasks
+## Tasks： workflow的基石
 Tasks are the building blocks of Workflow. There must be at least one task in a Workflow.  
+be the building blocks of sth: 是 ... 的基石
 Tasks can be categorized into two types: 
 
  * [Systems tasks](../../configuration/systask) - executed by Conductor server.

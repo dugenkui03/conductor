@@ -42,6 +42,9 @@ public class IsolatedTaskQueueProducer {
 	public IsolatedTaskQueueProducer(MetadataService metadataService, Configuration config) {
 
 		this.metadataService = metadataService;
+
+		//https://netflix.github.io/conductor/configuration/isolationgroups/
+		// 为了支持 isolationgroups 特性，需要打开此开关、默认为false
 		boolean listenForIsolationGroups = config.getBooleanProperty("workflow.isolated.system.task.enable", false);
 
 		if (listenForIsolationGroups) {

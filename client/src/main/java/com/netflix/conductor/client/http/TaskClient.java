@@ -42,9 +42,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author visingh
- * @author Viren
  * Client for conductor task management including polling for task, updating task status etc.
+ * conductor任务管理的客户端：轮询任务、更新任务状态、执行之后更新任务结果。
  */
 public class TaskClient extends ClientBase {
 

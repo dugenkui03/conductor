@@ -68,9 +68,8 @@ public interface Worker {
 
     }
 
-    /**
-     * 重写该方法、将worker从轮询中停止。
-     * Override this method to pause the worker from polling.
+    /** 为true的时候，worker停止轮询。
+     *  Override this method to pause the worker from polling.
      *
      * @return true if the worker is paused and no more tasks should be polled(轮询) from server.
      *          worker停止、则返回true。
@@ -110,13 +109,8 @@ public interface Worker {
         return PropertyFactory.getInteger(getTaskDefName(), "pollCount", 1);
     }
 
-    /**
-     * 获取轮询的间隔，单位毫秒。
-     *
-     * Override this method to change the interval between polls.
-     *
-     * @return interval in millisecond at which the server should be polled for worker tasks.
-     */
+    // interval in millisecond at which the server should be polled for worker tasks.
+    // server轮询工作任务的间隔、单位毫秒。
     default int getPollingInterval() {
         return PropertyFactory.getInteger(getTaskDefName(), "pollInterval", 1000);
     }

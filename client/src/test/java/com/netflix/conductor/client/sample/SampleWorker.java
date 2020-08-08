@@ -44,10 +44,13 @@ public class SampleWorker implements Worker {
      */
     @Override
     public TaskResult execute(Task task) {
+        //构造结果对象
         TaskResult result = new TaskResult(task);
+
+        //任务执行状态
         result.setStatus(Status.COMPLETED);
 
-        //Register the output of the task
+        //任务结果
         result.getOutputData().put("outputKey1", "value");
         result.getOutputData().put("oddEven", 1);
         result.getOutputData().put("mod", 4);

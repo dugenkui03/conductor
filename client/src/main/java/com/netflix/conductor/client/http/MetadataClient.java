@@ -30,7 +30,8 @@ import org.apache.commons.lang.StringUtils;
 
 import java.util.List;
 
-//元数据客户端：注册工作流定义、任务定义等
+// https://netflix.github.io/conductor/gettingstarted/client/
+// 元数据客户端：注册工作流定义、任务定义等
 public class MetadataClient extends ClientBase {
 
     // 工作流 定义列表

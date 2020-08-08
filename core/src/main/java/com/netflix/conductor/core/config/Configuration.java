@@ -59,7 +59,8 @@ public interface Configuration {
     String SYSTEM_TASK_WORKER_ISOLATED_THREAD_COUNT_PROPERTY_NAME = "workflow.isolated.system.task.worker.thread.count";
     int SYSTEM_TASK_WORKER_ISOLATED_THREAD_COUNT_DEFAULT_VALUE = 1;
 
-    //系统任务队列轮询数量
+    // 系统任务队列轮询数量，支持 isolation groups 特性
+    // https://netflix.github.io/conductor/configuration/isolationgroups/
     String SYSTEM_TASK_MAX_POLL_COUNT_PROPERTY_NAME = "workflow.system.task.queue.pollCount";
     int SYSTEM_TASK_MAX_POLL_COUNT_DEFAULT_VALUE = 1;
 

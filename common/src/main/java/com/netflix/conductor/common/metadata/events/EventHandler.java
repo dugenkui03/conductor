@@ -27,9 +27,13 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-/**
- * @author Viren
- * Defines an event handler
+
+/**https://netflix.github.io/conductor/configuration/eventhandlers/
+ * Eventing in Conductor provides for loose coupling(松耦合) between workflows
+ * and support for producing and consuming events from external systems.
+ *
+ * Conductor中定义的时间提供了工作流之间的松耦合，并且支持外部系统生产和消费事件。
+ *
  */
 @ProtoMessage
 public class EventHandler {

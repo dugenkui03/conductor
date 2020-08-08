@@ -207,7 +207,7 @@ public class MetricsContainer {
 
     /**
      * 这个指标用于跟踪 来自被降级的类的 客户端升级
-     * This metric is used for tracking client upgrades from the deprecated class
+     * This metric(指标) is used for tracking client upgrades from the deprecated class
      * {@link com.netflix.conductor.client.task.WorkflowTaskCoordinator} to
      * {@link com.netflix.conductor.client.automator.TaskRunnerConfigurer}
      *

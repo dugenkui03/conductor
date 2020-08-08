@@ -73,6 +73,7 @@ public class Task {
     @ProtoField(id = 1)
     private String taskType;
 
+    //生命周期介绍： https://netflix.github.io/conductor/tasklifecycle/
     @ProtoField(id = 2)
     private Status status;
 

@@ -25,7 +25,7 @@ import com.netflix.conductor.core.execution.DeciderService;
 import java.util.Map;
 
 /**
- * Business Object class used for interaction between the DeciderService and Different Mappers
+ * Business(业务) Object class used for interaction(在...之间交互) between the DeciderService(决定者服务) and Different Mappers
  */
 public class TaskMapperContext {
 

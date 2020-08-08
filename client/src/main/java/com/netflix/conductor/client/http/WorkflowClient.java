@@ -40,13 +40,11 @@ import java.io.IOException;
 import java.util.List;
 
 
-/**
- * @author Viren
- */
+// Start a new workflow
+// Get execution status of a workflow
 public class WorkflowClient extends ClientBase {
 
-    private static GenericType<SearchResult<WorkflowSummary>> searchResultWorkflowSummary = new GenericType<SearchResult<WorkflowSummary>>() {
-    };
+    private static GenericType<SearchResult<WorkflowSummary>> searchResultWorkflowSummary = new GenericType<SearchResult<WorkflowSummary>>() {};
 
     private static final Logger logger = LoggerFactory.getLogger(WorkflowClient.class);
 
