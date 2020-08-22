@@ -79,28 +79,33 @@ public class JettyServer implements Lifecycle {
         contextHandler.setWelcomeFiles(new String[]{"index.html"});
         server.setHandler(contextHandler);
 
-        // 查看系统属性是否有 enableJMX
+        // 查看系统属性是否有 enableJMX，有的话 加载bean和监听器
         if (Boolean.getBoolean("enableJMX")) {
             System.out.println("configure MBean container...");
             configureMBeanContainer(server);
         }
+
+        // 开始启动jetty服务
         server.start();
         System.out.println("Started server on http://localhost:" + port + "/");
         try {
-            if (Boolean.getBoolean("loadSample")) {
+            // 是否加载样例
+//            if (Boolean.getBoolean("loadSample")) {
                 System.out.println("Creating kitchensink workflow");
                 createKitchenSink(port);
-            }
+//            }
         } catch (Exception e) {
             logger.error("Error loading sample!", e);
         }
 
+        // 阻塞、直至线程池stop
         if (join) {
             server.join();
         }
 
     }
 
+    // 停止服务
     public synchronized void stop() throws Exception {
         if (server == null) {
             throw new IllegalStateException("Server is not running.  call #start() method to start the server");
@@ -159,7 +164,7 @@ public class JettyServer implements Lifecycle {
 
     }
 
-    /**
+    /**加载bean和监听器
      * Enabled JMX reporting:
      * https://docs.newrelic.com/docs/agents/java-agent/troubleshooting/application-server-jmx-setup
      * https://www.eclipse.org/jetty/documentation/current/jmx-chapter
