@@ -33,18 +33,22 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
 
+        // 加载conductor配置文件
         BootstrapUtil.loadConfigFile(args.length > 0 ? args[0] : System.getenv("CONDUCTOR_CONFIG_FILE"));
 
+        // 加载log4j配置文件
         if (args.length == 2) {
             System.out.println("Using log4j config " + args[1]);
             PropertyConfigurator.configure(new FileInputStream(new File(args[1])));
         }
 
+        // 为给定的module创建 启动注解器/injector
         Injector bootstrapInjector = Guice.createInjector(new BootstrapModule());
         ModulesProvider modulesProvider = bootstrapInjector.getInstance(ModulesProvider.class);
-        Injector serverInjector = Guice.createInjector(modulesProvider.get());
 
+        Injector serverInjector = Guice.createInjector(modulesProvider.get());
         Optional<EmbeddedElasticSearch> embeddedElasticSearch = serverInjector.getInstance(EmbeddedElasticSearchProvider.class).get();
+
         embeddedElasticSearch.ifPresent(BootstrapUtil::startEmbeddedElasticsearchServer);
 
         BootstrapUtil.setupIndex(serverInjector.getInstance(IndexDAO.class));

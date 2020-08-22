@@ -34,7 +34,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-import static java.lang.Boolean.getBoolean;
 import static java.lang.management.ManagementFactory.getPlatformMBeanServer;
 import static org.eclipse.jetty.util.log.Log.getLog;
 
@@ -49,7 +48,9 @@ public class JettyServer implements Lifecycle {
     private final int port;
     private final boolean join;
 
-    //jetty服务、组合 todo volatile、防止指令重排
+    //jetty服务(组合)：提供HTTP服务
+    // https://developer.ibm.com/zh/articles/j-lo-jetty/
+    // todo volatile、防止指令重排
     private Server server;
 
 
@@ -69,21 +70,24 @@ public class JettyServer implements Lifecycle {
         //指定端口新建jetty服务
         this.server = new Server(port);
 
+        /**
+         * 创建上下文处理器：ContextHandler
+         */
         //servlet上下文处理器、还是jetty的东西
         ServletContextHandler contextHandler = new ServletContextHandler();
-        //拦截路径
         contextHandler.addFilter(GuiceFilter.class, "/*", EnumSet.allOf(DispatcherType.class));
         contextHandler.setWelcomeFiles(new String[]{"index.html"});
-
         server.setHandler(contextHandler);
-        if (getBoolean("enableJMX")) {
+
+        // 查看系统属性是否有 enableJMX
+        if (Boolean.getBoolean("enableJMX")) {
             System.out.println("configure MBean container...");
             configureMBeanContainer(server);
         }
         server.start();
         System.out.println("Started server on http://localhost:" + port + "/");
         try {
-            if (getBoolean("loadSample")) {
+            if (Boolean.getBoolean("loadSample")) {
                 System.out.println("Creating kitchensink workflow");
                 createKitchenSink(port);
             }
