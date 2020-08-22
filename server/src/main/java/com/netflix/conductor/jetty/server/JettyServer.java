@@ -49,7 +49,7 @@ public class JettyServer implements Lifecycle {
     private final int port;
     private final boolean join;
 
-    //jetty服务、组合
+    //jetty服务、组合 todo volatile、防止指令重排
     private Server server;
 
 
