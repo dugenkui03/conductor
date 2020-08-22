@@ -170,6 +170,15 @@ public abstract class ClientBase {
         return null;
     }
 
+    /**
+     * @param url 接口路径，例如 tasks/poll/{taskType}
+     * @param queryParams 参数，例如 Object[] params = new Object[]{"workerid", workerId, "domain", domain};
+     * @param responseType 返回实体类型，例如：Task.class
+     * @param uriVariables uri变量
+     * @param <T>
+     *
+     * @return 从url接口获取的实体
+     */
     protected <T> T getForEntity(String url, Object[] queryParams, Class<T> responseType, Object... uriVariables) {
         return getForEntity(url, queryParams, response -> response.getEntity(responseType), uriVariables);
     }

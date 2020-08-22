@@ -36,13 +36,15 @@ class PollingSemaphore {
         semaphore = new Semaphore(numSlots);
     }
 
-    /**
+    /**通过信号量semaphore的许可，来确认是否可以轮询
+     *
      * Signals if polling is allowed based on whether a permit can be acquired.
      *
      * @return {@code true} - if permit is acquired 是否可以获取到轮询许可
      *         {@code false} - if permit could not be acquired
      */
     boolean canPoll() {
+        //获取不到则立即返回false
         boolean acquired = semaphore.tryAcquire();
         LOGGER.debug("Trying to acquire permit: {}", acquired);
         return acquired;
@@ -59,7 +61,7 @@ class PollingSemaphore {
     }
 
     /**
-     * 获取可用于轮询的线程数量。
+     * 获取当前可用于轮询的线程数量。
      *
      * Gets the number of threads available for processing.
      *

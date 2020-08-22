@@ -26,18 +26,23 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-/** 通过注册的Worker配置 自动轮询和执行任务。
+/** 通过注册的Worker配置和TaskClient，自动轮询和执行任务。
  * Configures automated polling(轮询) of tasks and execution via the registered {@link Worker}s.
  */
 public class TaskRunnerConfigurer {
 
     private ScheduledExecutorService scheduledExecutorService;
 
+    // 用于识别服务端是否在discovery状态中
+    // EurekaClient：用于服务发现：https://juejin.im/entry/6844903639778066446
     private final EurekaClient eurekaClient;
+
+
     private final TaskClient taskClient;
     private List<Worker> workers = new LinkedList<>();
     private final int sleepWhenRetry;
     private final int updateRetryCount;
+    // 赋给worker线程的数量，应该至少为taskWorkers的数量、来避免线程饥饿
     private final int threadCount;
     private final String workerNamePrefix;
 
@@ -65,11 +70,14 @@ public class TaskRunnerConfigurer {
         private String workerNamePrefix = "workflow-worker-";
         private int sleepWhenRetry = 500;
         private int updateRetryCount = 3;
+
+        // 赋给worker线程的数量，应该至少为taskWorkers的数量、来避免线程饥饿
         private int threadCount = -1;
         private Iterable<Worker> workers;
         private EurekaClient eurekaClient;
         private TaskClient taskClient;
 
+        // 设置 任务客户端  和 worker列表
         public Builder(TaskClient taskClient, Iterable<Worker> workers) {
             Preconditions.checkNotNull(taskClient, "TaskClient cannot be null");
             Preconditions.checkNotNull(workers, "Workers cannot be null");
@@ -98,7 +106,7 @@ public class TaskRunnerConfigurer {
         }
 
         /**
-         * worker线程的数量，应该只是为taskWorkers的数量、来避免线程饥饿。
+         * 赋给worker线程的数量，应该至少为taskWorkers的数量、来避免线程饥饿。
          * @param threadCount # of threads assigned to the workers. Should be at-least the size of taskWorkers to avoid
          *                    starvation in a busy system.
          * @return Builder instance
@@ -182,8 +190,10 @@ public class TaskRunnerConfigurer {
         // fixme 对于每一个woker都有一个 taskPollExecutor(任务轮询执行器) 进行驱动
         for (Worker worker : workers) {
             scheduledExecutorService.scheduleWithFixedDelay(
+                    // 任务定义
                     () -> taskPollExecutor.pollAndExecute(worker),
-                    worker.getPollingInterval(),//server轮询工作任务的间隔
+                    // 轮询周期定义
+                    worker.getPollingInterval(),
                     worker.getPollingInterval(),
                     TimeUnit.MILLISECONDS);
         }

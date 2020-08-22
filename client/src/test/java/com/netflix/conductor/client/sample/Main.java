@@ -19,6 +19,7 @@ import com.netflix.conductor.client.automator.TaskRunnerConfigurer;
 import com.netflix.conductor.client.http.TaskClient;
 import com.netflix.conductor.client.worker.Worker;
 import java.util.Arrays;
+import java.util.List;
 
 public class Main {
 
@@ -26,8 +27,9 @@ public class Main {
 
         //任务client
         TaskClient taskClient = new TaskClient();
+
         //服务api的根uri
-        taskClient.setRootURI("http://localhost:8080/api/");        //Point this to the server API
+        taskClient.setRootURI("http://localhost:8081/api/");        //Point this to the server API
 
         //指定worker线程数量，为了避免线程饥饿、线程数量不应该小于worker数量
         //number of threads used to execute workers.  To avoid starvation, should be same or more than number of workers
@@ -36,6 +38,7 @@ public class Main {
         //创建worker
         Worker worker1 = new SampleWorker("task_1");
         Worker worker2 = new SampleWorker("task_5");
+        List<Worker> workers = Arrays.asList(worker1, worker2);
 
         /** TaskRunnerConfigurer：通过注册的Worker配置 自动轮询和执行任务
          *  https://netflix.github.io/conductor/gettingstarted/client/#taskrunnerconfigurer
@@ -43,9 +46,15 @@ public class Main {
          * 1. configurer中的worker1和worker2一直轮询server、执行任务，任务执行逻辑见SampleWorker；
          * 2. threadCount：默认3。
          */
-        TaskRunnerConfigurer configurer = new TaskRunnerConfigurer.Builder(taskClient, Arrays.asList(worker1, worker2)).withThreadCount(threadCount).build();
+        TaskRunnerConfigurer configurer = new TaskRunnerConfigurer
+                // 设置 任务客户端  和 worker列表
+                // 任务客户端：任务管理的客户端，轮询任务、更新任务状态、执行任务之后更新任务结果
+                .Builder(taskClient, workers)
+                .withThreadCount(threadCount)
+                .build();
 
         // Start the polling and execution of tasks
+        // 开始轮询和执行任务
         configurer.init();
     }
 }

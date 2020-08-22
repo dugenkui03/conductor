@@ -41,9 +41,9 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
+/** fixme conductor任务管理的客户端：轮询任务、更新任务状态、执行任务之后更新任务结果。
+ *
  * Client for conductor task management including polling for task, updating task status etc.
- * conductor任务管理的客户端：轮询任务、更新任务状态、执行之后更新任务结果。
  */
 public class TaskClient extends ClientBase {
 
@@ -106,19 +106,25 @@ public class TaskClient extends ClientBase {
     }
 
     /**
+     * fixme 轮询获取指定的任务定义
      * Perform a poll for a task of a specific task type.
      *
-     * @param taskType The taskType to poll for
-     * @param domain   The domain of the task type
-     * @param workerId Name of the client worker. Used for logging.
-     * @return Task waiting to be executed.
+     * @param taskType The taskType to poll for 要轮询的任务类型
+     * @param domain   The domain of the task type 任务类型的域
+     * @param workerId Name of the client worker. Used for logging. client worker的名称，用来记录日志
+     *
+     * @return Task waiting to be executed. 要被执行的任务
      */
     public Task pollTask(String taskType, String workerId, String domain) {
         Preconditions.checkArgument(StringUtils.isNotBlank(taskType), "Task type cannot be blank");
         Preconditions.checkArgument(StringUtils.isNotBlank(workerId), "Worker id cannot be blank");
 
         Object[] params = new Object[]{"workerid", workerId, "domain", domain};
+
+        // tasks/poll/taskType 是轮询获取任务的接口
+        // https://netflix.github.io/conductor/faq/#where-does-my-worker-run-how-does-conductor-run-my-tasks
         Task task = Optional.ofNullable(getForEntity("tasks/poll/{taskType}", params, Task.class, taskType))
+             // 如果 getForEntity 为空，则返回 orElse中的new Task()
             .orElse(new Task());
         populateTaskInput(task);
         return task;
@@ -208,8 +214,7 @@ public class TaskClient extends ClientBase {
     }
 
     /**
-     * 更新任务执行的结果
-     * Updates the result of a task execution.
+     * Updates the result of a task execution. 更新任务执行的结果.
      *
      * If the size of the task output payload is bigger than {@link ConductorClientConfiguration#getTaskOutputPayloadThresholdKB()},
      * it is uploaded to {@link ExternalPayloadStorage}, if enabled, else the task is marked as FAILED_WITH_TERMINAL_ERROR.

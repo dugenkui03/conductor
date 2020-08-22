@@ -140,18 +140,22 @@ public class Task {
     @ProtoField(id = 19)
     private long responseTimeoutSeconds;
 
+    // 工作流实例id
     @ProtoField(id = 20)
     private String workflowInstanceId;
 
     @ProtoField(id = 21)
     private String workflowType;
 
+    // 被更新的任务ID?
     @ProtoField(id = 22)
     private String taskId;
 
+    // 如果更新任务失败、则表示失败原因
     @ProtoField(id = 23)
     private String reasonForIncompletion;
 
+    //
     @ProtoField(id = 24)
     private long callbackAfterSeconds;
 

@@ -96,11 +96,12 @@ public class MetricsContainer {
     private MetricsContainer() {
     }
 
-    //获取指定任务的轮询时长
+    //获取任务名称为taskType的轮询时长
     public static Timer getPollTimer(String taskType) {
         return getTimer(TASK_POLL_TIME, TASK_TYPE, taskType);
     }
 
+    // 获取执行Timer
     public static Timer getExecutionTimer(String taskType) {
         return getTimer(TASK_EXECUTE_TIME, TASK_TYPE, taskType);
     }
