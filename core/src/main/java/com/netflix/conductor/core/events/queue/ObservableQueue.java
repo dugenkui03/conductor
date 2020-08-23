@@ -23,46 +23,27 @@ import rx.Observable;
 import java.util.List;
 
 /**
- * @author Viren
- *
+ * 可观察的队列？
  */
 public interface ObservableQueue {
 
-	/**
-	 *
-	 * @return An observable for the given queue
-	 */
+	// 返回给定队列的观察者 @return An observable for the given queue
 	Observable<Message> observe();
 
-	/**
-	 *
-	 * @return Type of the queue
-	 */
+	// Type of the queue
 	String getType();
 
-	/**
-	 *
-	 * @return Name of the queue
-	 */
+	// Name of the queue
 	String getName();
 
-	/**
-	 *
-	 * @return URI identifier for the queue.
-	 */
+	// 队列的URI标志符 URI identifier for the queue.
 	String getURI();
 
-	/**
-	 *
-	 * @param messages messages to be ack'ed
-	 * @return the id of the ones which could not be ack'ed
-	 */
+	// 传入需要被ack的消息；
+	// 返回不能被ack的消息id；
 	List<String> ack(List<Message> messages);
 
-	/**
-	 *
-	 * @param messages Messages to be published
-	 */
+	//要被公布的消息
 	void publish(List<Message> messages);
 
 	/**
@@ -83,14 +64,11 @@ public interface ObservableQueue {
 	 */
 	void setUnackTimeout(Message message, long unackTimeout);
 
-	/**
-	 *
-	 * @return Size of the queue - no. messages pending.  Note: Depending upon the implementation, this can be an approximation
-	 */
+	// 队列的大小 - no. messages pending(挂起)
+	// 注意：取决于其实现，这个可以是个近似值。
 	long size();
 
-	/**
-	 *  Used to close queue instance prior to remove from queues
-	 */
+	// 用于关闭队列实例
+	// Used to close queue instance prior to remove from queues
 	default  void close() { }
 }

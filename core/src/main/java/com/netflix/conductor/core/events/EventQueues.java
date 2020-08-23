@@ -30,12 +30,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/**
- * @author Viren
+/**fixme 保存内部的事件队列
+ *
  * Holders for internal event queues
  */
 @Singleton
 public class EventQueues {
+
 	public static final String EVENT_QUEUE_PROVIDERS_QUALIFIER = "EventQueueProviders";
 
 	private static final Logger logger = LoggerFactory.getLogger(EventQueues.class);

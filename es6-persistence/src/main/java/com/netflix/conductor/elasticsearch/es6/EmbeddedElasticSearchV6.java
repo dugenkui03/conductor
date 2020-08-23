@@ -28,28 +28,35 @@ import org.elasticsearch.transport.Netty4Plugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// es 搜索简介：https://www.ruanyifeng.com/blog/2017/08/elasticsearch.html
 public class EmbeddedElasticSearchV6 implements EmbeddedElasticSearch {
 
     private static final Logger logger = LoggerFactory.getLogger(EmbeddedElasticSearchV6.class);
 
+    // 集群名称、主机和端口
     private final String clusterName;
     private final String host;
     private final int port;
 
+    // es 节点 和 数据文件夹
+    // "单个 Elastic 实例称为一个节点（node）。一组节点构成一个集群（cluster）"
     private Node instance;
     private File dataDir;
 
+    // 集群、主机、端口
     public EmbeddedElasticSearchV6(String clusterName, String host, int port) {
         this.clusterName = clusterName;
         this.host = host;
         this.port = port;
     }
 
+    // "插件化的可配置的节点？"
     private class PluginConfigurableNode extends Node {
         public PluginConfigurableNode(Settings preparedSettings, Collection<Class<? extends Plugin>> classpathPlugins) {
             super(InternalSettingsPreparer.prepareEnvironment(preparedSettings, null), classpathPlugins, false);
         }
 
+        // 使用Logger对象注册启动节点名称
         @Override
         protected void registerDerivedNodeNameWithLogger(String nodeName) {
             logger.info("Registered derived node name {} with logger", nodeName);

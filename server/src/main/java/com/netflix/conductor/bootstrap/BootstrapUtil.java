@@ -25,9 +25,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 
+// 启动类
 public class BootstrapUtil {
+    // 打开内置的 elasticSearch 服务
     public static void startEmbeddedElasticsearchServer(EmbeddedElasticSearch embeddedElasticsearchInstance) {
 
+        //内置的es初始化时间
         final int EMBEDDED_ES_INIT_TIME = 5000;
         try {
             embeddedElasticsearchInstance.start();

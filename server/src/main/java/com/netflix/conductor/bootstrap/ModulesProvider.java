@@ -55,22 +55,27 @@ import java.util.List;
 
 import static java.util.Collections.singletonList;
 
-// TODO Investigate whether this should really be a ThrowingProvider.
+// TODO
+//      Investigate whether this should really be a ThrowingProvider.
+//      研究下、是否真的应该是是个ThrowingProvider
 public class ModulesProvider implements Provider<List<AbstractModule>> {
     private static final Logger logger = LoggerFactory.getLogger(ModulesProvider.class);
 
     private final Configuration configuration;
 
+    // 额外、净负载、存储类型
     enum ExternalPayloadStorageType {
         S3,
         DUMMY
     }
 
+    // Inject 注入Configuration实现类？
     @Inject
     public ModulesProvider(Configuration configuration) {
         this.configuration = configuration;
     }
 
+    // 返回一个完全构造和注入的实例 List<AbstractModule>
     @Override
     public List<AbstractModule> get() {
         AbstractModule resolvedModule = (AbstractModule) Modules.override(selectModulesToLoad()).with(configuration.getAdditionalModules());

@@ -32,7 +32,8 @@ import java.util.concurrent.CompletableFuture;
  */
 public interface IndexDAO {
 
-    /**
+    /** 设置charge和初始化索引的方法
+     *
      * Setup method in charge or initializing/populating the index.
      */
     void setup() throws Exception;

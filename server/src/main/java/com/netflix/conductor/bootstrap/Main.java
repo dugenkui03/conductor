@@ -42,15 +42,20 @@ public class Main {
             PropertyConfigurator.configure(new FileInputStream(new File(args[1])));
         }
 
+        /**
+         * https://www.jianshu.com/p/a648322dc680
+         * https://zhuanlan.zhihu.com/p/32299568
+         */
         // 为给定的module创建 启动注解器/injector
         Injector bootstrapInjector = Guice.createInjector(new BootstrapModule());
         ModulesProvider modulesProvider = bootstrapInjector.getInstance(ModulesProvider.class);
-
         Injector serverInjector = Guice.createInjector(modulesProvider.get());
         Optional<EmbeddedElasticSearch> embeddedElasticSearch = serverInjector.getInstance(EmbeddedElasticSearchProvider.class).get();
 
+        // 启动内置的 es 服务
         embeddedElasticSearch.ifPresent(BootstrapUtil::startEmbeddedElasticsearchServer);
 
+        //获取ElasticSearchDAOV6对象，并作为setupIndex参数-设置charge和初始化索引的方法
         BootstrapUtil.setupIndex(serverInjector.getInstance(IndexDAO.class));
 
         try {
@@ -69,10 +74,13 @@ public class Main {
         System.out.println(" \\___\\___/|_| |_|\\__,_|\\__,_|\\___|\\__\\___/|_|   ");
         System.out.println("\n\n\n");
 
+        // 获取gRPC服务
         Optional<GRPCServer> grpcServer = serverInjector.getInstance(GRPCServerProvider.class).get();
 
+        // 启动gRPC服务
         grpcServer.ifPresent(BootstrapUtil::startGRPCServer);
 
+        //JettyServer服务
         serverInjector.getInstance(JettyServerProvider.class).get().ifPresent(server -> {
             try {
                 server.start();

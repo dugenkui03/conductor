@@ -445,10 +445,12 @@ public interface Configuration {
 	Long getMaxTaskOutputPayloadSizeThresholdKB();
 
 
+	// 存储类型：redis、DYNOMITE(netflix存储)、redis集群、mysql、postgres...
     enum DB {
         REDIS, DYNOMITE, MEMORY, REDIS_CLUSTER, MYSQL, POSTGRES, CASSANDRA, REDIS_SENTINEL
     }
 
+    // 锁服务？：无操作锁，redis、zookeeper和 local_only
     enum LOCKING_SERVER {
         NOOP_LOCK, REDIS, ZOOKEEPER, LOCAL_ONLY
     }

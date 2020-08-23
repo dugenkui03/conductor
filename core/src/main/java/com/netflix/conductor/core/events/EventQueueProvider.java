@@ -21,10 +21,10 @@ package com.netflix.conductor.core.events;
 import com.netflix.conductor.core.events.queue.ObservableQueue;
 
 /**
- * @author Viren
- *
+ * 事件队列提供者
  */
 public interface EventQueueProvider {
 
+	//根据队列URI获取 可观察的队列
 	ObservableQueue getQueue(String queueURI);
 }

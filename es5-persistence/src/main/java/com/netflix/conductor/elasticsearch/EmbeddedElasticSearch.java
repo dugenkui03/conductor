@@ -22,6 +22,7 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// 内置的 elasticSearch
 public interface EmbeddedElasticSearch extends Lifecycle {
     Logger logger = LoggerFactory.getLogger(EmbeddedElasticSearch.class);
 
