@@ -35,6 +35,7 @@ public class Task {
     @ProtoEnum
     public enum Status {
 
+        // 处理中
         IN_PROGRESS(false, true, true),
         CANCELED(true, false, false),
         FAILED(true, false, true),
